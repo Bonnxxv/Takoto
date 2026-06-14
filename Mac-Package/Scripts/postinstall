@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Define paths
+INSTALL_PATH="/Applications"
+APP_PATH="$INSTALL_PATH/Takoto.app"
+RESOURCES_PATH="$APP_PATH/Contents/Resources/resources"
+UTILITY_PATH="/Library/Application Support/Blackmagic Design/DaVinci Resolve/Fusion/Scripts/Utility"
+WORKFLOW_INTEGRATION_PATH="/Library/Application Support/Blackmagic Design/DaVinci Resolve/Workflow Integration Plugins"
+TEXT_FILE="$UTILITY_PATH/Takoto/install_path.txt"
+
+# Copy Lua file
+cp "$RESOURCES_PATH/Takoto.lua" "$UTILITY_PATH"
+cp -r "$RESOURCES_PATH/Takoto" "$UTILITY_PATH"
+
+# Write JSON file with installation path
+echo $INSTALL_PATH > "$TEXT_FILE"
+
+# Also copy lua file to Workflow Integration Plugin for ease of use
+cp "$RESOURCES_PATH/Takoto.lua" "$WORKFLOW_INTEGRATION_PATH"
+
+# Remove legacy V2 Lua script if present
+rm -f "$UTILITY_PATH/Takoto V2.lua"
+
+exit 0
