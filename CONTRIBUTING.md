@@ -1,5 +1,5 @@
 
-# Contributing to auto-subs
+# Contributing to Takoto
 
 Thank you for considering contributing to Takoto! <br>
 I welcome contributions from everyone. I will try to review any pull requests as soon possible 😊
@@ -11,11 +11,11 @@ I welcome contributions from everyone. I will try to review any pull requests as
 1. Fork the repository by clicking the "Fork" button at the top right of the repository page.
 2. Clone your forked repository to your local machine:
    ```sh
-   git clone https://github.com/YOUR-USERNAME/auto-subs.git
+   git clone https://github.com/YOUR-USERNAME/Takoto.git
    ```
 3. Navigate to the cloned directory:
    ```sh
-   cd auto-subs
+   cd Takoto
    ```
 
 ### Create a Branch

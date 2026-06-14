@@ -1,10 +1,8 @@
 # Takoto – Subtitles Made Simple
 Create high‑quality subtitles with **one click**. Takoto delivers **fast, accurate, and fully customisable** subtitles in a sleek, intuitive interface. Now works with Davinci Resolve and standalone.
 
-### 📥 One-Click Installer: [Windows ](https://github.com/tmoroney/auto-subs/releases/latest/download/Takoto-windows-x86_64.exe) ✨ [MacOS (ARM)](https://github.com/tmoroney/auto-subs/releases/latest/download/Takoto-Mac-ARM.pkg) ✨ [MacOS (Intel)](https://github.com/tmoroney/auto-subs/releases/latest/download/Takoto-Mac-Intel.pkg)
-**💡 100,000+ downloads so far!**
-
-<a href="https://www.buymeacoffee.com/tmoroney" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+### 📥 Installer
+Unduh installer versi terbaru melalui halaman **Releases** di repositori GitHub Anda.
 
 ## 🚀 What’s New in V3
 - **Complete UI Overhaul** — Cleaner, more consistent, and more discoverable controls.

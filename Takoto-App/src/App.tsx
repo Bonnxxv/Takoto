@@ -1,6 +1,6 @@
 // App.tsx
 import { ThemeProvider, useTheme } from "@/components/theme-provider";
-import { Captions, Heart, Moon, Sun } from "lucide-react"
+import { Captions, Moon, Sun } from "lucide-react"
 import { useGlobal } from "@/contexts/GlobalContext";
 import { Button } from "@/components/ui/button"
 import React from "react"
@@ -125,21 +125,6 @@ function App() {
                           </TabsList>
                         </Tabs>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="group transition-all hover:bg-secondary/50"
-                        asChild
-                      >
-                        <a
-                          href="https://buymeacoffee.com/tmoroney"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="Support on Buy Me a Coffee"
-                        >
-                          <Heart className="h-5 w-5 fill-background group-hover:fill-pink-500 group-hover:text-pink-500 group-hover:animate-pulse transition-all"/>
-                        </a>
-                      </Button>
                     </header>
                   )}
 
