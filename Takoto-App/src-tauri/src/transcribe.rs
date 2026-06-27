@@ -917,7 +917,7 @@ pub async fn run_transcription_pipeline<R: Runtime>(
     ctx: WhisperContext,
     options: TranscribeOptions,
     progress_callback: Option<Box<dyn Fn(i32) + Send + Sync>>,
-    new_segment_callback: Option<Box<dyn Fn(Segment) + Send>>,
+    _new_segment_callback: Option<Box<dyn Fn(Segment) + Send>>,
     abort_callback: Option<Box<dyn Fn() -> bool + Send>>,
     diarize_options: Option<DiarizeOptions>,
     additional_ffmpeg_args: Option<Vec<String>>,

@@ -18,6 +18,7 @@ use tauri_plugin_store::Builder as StoreBuilder;
 use tauri_plugin_clipboard_manager::init as clipboard_plugin;
 use tauri_plugin_opener::init as opener_plugin;
 use tauri_plugin_dialog::init as dialog_plugin;
+use tauri_plugin_os::init as os_plugin;
 use tokio::process::Command as TokioCommand;
 
 mod audio;
@@ -38,7 +39,7 @@ static EXITING: AtomicBool = AtomicBool::new(false);
 fn main() {
     whisper_rs::install_logging_hooks();
     tauri::Builder::default()
-        .plugin(tauri_plugin_os::init())
+        .plugin(os_plugin())
         .plugin(StoreBuilder::default().build())
         // Register each plugin
         .plugin(http_plugin())
