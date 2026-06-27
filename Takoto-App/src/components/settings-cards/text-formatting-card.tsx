@@ -41,6 +41,7 @@ interface TextFormattingCardProps {
   onCensoredWordsChange: (words: string[]) => void
   onResetSettings?: () => void
   isWalkthroughMode?: boolean
+  compact?: boolean
 }
 
 export const TextFormattingCard = ({
@@ -61,10 +62,158 @@ export const TextFormattingCard = ({
   onEnableCensorChange,
   onCensoredWordsChange,
   onResetSettings,
-  isWalkthroughMode = false
+  isWalkthroughMode = false,
+  compact = false,
 }: TextFormattingCardProps) => {
   const [newCensoredWord, setNewCensoredWord] = useState("");
   const { reformatSubtitles } = useGlobal();
+
+  const lineSummary = [
+    `${maxLinesPerSubtitle}L`,
+    maxCharsPerLine > 0 ? `${maxCharsPerLine}c` : null,
+    maxWordsPerLine > 0 ? `${maxWordsPerLine}w` : null,
+    splitOnPunctuation ? 'split' : null,
+  ].filter(Boolean).join(' • ')
+
+  const formatPopover = (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="icon" className="h-8 w-8 flex-shrink-0">
+          <Settings className="w-4 h-4" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-4" align="end">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Batas Karakter</p>
+              {maxCharsPerLine === 0 ? <p className="text-xs text-orange-500 flex items-center gap-1"><CircleX className="w-3 h-3" /> Nonaktif</p> : <p className="text-xs text-muted-foreground">Per baris (0 = tanpa batas)</p>}
+            </div>
+            <Input type="number" min="0" value={maxCharsPerLine} onChange={(e) => onMaxCharsPerLineChange(Number(e.target.value))} className="w-20" />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Batas Kata</p>
+              {maxWordsPerLine === 0 ? <p className="text-xs text-orange-500 flex items-center gap-1"><CircleX className="w-3 h-3" /> Nonaktif</p> : <p className="text-xs text-muted-foreground">Per baris (0 = tanpa batas)</p>}
+            </div>
+            <Input type="number" min="0" value={maxWordsPerLine} onChange={(e) => onMaxWordsPerLineChange(Number(e.target.value))} className="w-20" />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Jumlah Baris</p>
+              <p className="text-xs text-muted-foreground">Baris maksimal per subtitle</p>
+            </div>
+            <Input type="number" min="1" value={maxLinesPerSubtitle} onChange={(e) => onMaxLinesPerSubtitleChange(Number(e.target.value))} className="w-20" />
+          </div>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium">Pisahkan pada Tanda Baca</p>
+              <p className="text-xs text-muted-foreground">Pemisahan baris alami</p>
+            </div>
+            <Switch checked={splitOnPunctuation} onCheckedChange={onSplitOnPunctuationChange} />
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+
+  if (compact) {
+    return (
+      <div>
+        {/* Aturan Baris */}
+        <div className="bg-card flex items-center gap-3 px-3.5 py-3">
+          <WholeWord className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <span className="text-sm">Aturan Baris</span>
+            <span className="text-xs text-muted-foreground ml-2">{lineSummary}</span>
+          </div>
+          {formatPopover}
+        </div>
+        {/* Kasus Teks */}
+        <div className="bg-card flex items-center gap-3 px-3.5 py-3 border-t border-border">
+          <AArrowUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="text-sm flex-1">Kasus Teks</span>
+          <Select value={textCase} onValueChange={(val) => onTextCaseChange(val as "none" | "uppercase" | "lowercase" | "titlecase")}>
+            <SelectTrigger className="w-[120px] h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="end">
+              <SelectItem value="none">Normal</SelectItem>
+              <SelectItem value="lowercase">huruf kecil</SelectItem>
+              <SelectItem value="uppercase">HURUF BESAR</SelectItem>
+              <SelectItem value="titlecase">Kasus Judul</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Hapus Tanda Baca */}
+        <div className="bg-card flex items-center gap-3 px-3.5 py-3 border-t border-border">
+          <Signature className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <span className="text-sm flex-1">Hapus Tanda Baca</span>
+          <Switch checked={removePunctuation} onCheckedChange={onRemovePunctuationChange} />
+        </div>
+        {/* Sensor */}
+        <div className="bg-card border-t border-border">
+          <div className="flex items-center gap-3 px-3.5 py-3">
+            <ShieldX className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <span className="text-sm flex-1">Sensor Kata Sensitif</span>
+            <Switch checked={enableCensor} onCheckedChange={onEnableCensorChange} />
+          </div>
+          {enableCensor && (
+            <div className="px-3.5 pb-3 space-y-2">
+              <form className="flex gap-2" onSubmit={e => { e.preventDefault(); if (!newCensoredWord.trim() || censoredWords.includes(newCensoredWord.trim())) return; onCensoredWordsChange([...censoredWords, newCensoredWord.trim()]); setNewCensoredWord(""); }}>
+                <Input value={newCensoredWord} onChange={e => setNewCensoredWord(e.target.value)} placeholder="Tambah kata" className="h-8 text-xs flex-1" />
+                <Button type="submit" size="sm" disabled={!newCensoredWord.trim() || censoredWords.includes(newCensoredWord.trim())}>Tambah</Button>
+              </form>
+              <ScrollArea className="max-h-[100px]">
+                {censoredWords.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-2">Belum ada kata.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {censoredWords.map((word, index) => (
+                      <Badge key={index} variant="secondary" className="flex items-center px-2 py-0.5 text-xs gap-1">
+                        {word}
+                        <button type="button" onClick={() => onCensoredWordsChange(censoredWords.filter((_, i) => i !== index))} className="hover:text-destructive">×</button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+          )}
+        </div>
+        {/* Buttons */}
+        {!isWalkthroughMode && (
+          <div className="flex gap-2 p-3 border-t border-border bg-card">
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="secondary" size="sm" className="flex-1 text-xs">
+                  <CircleFadingArrowUp className="w-3.5 h-3.5 mr-1.5" />
+                  Perbarui Subtitle
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                  <AlertDialogDescription>Ini akan membuang semua pengeditan subtitle manual dan membuat ulang subtitle menggunakan opsi pemformatan baru.</AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction onClick={reformatSubtitles}>Perbarui Subtitle</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+            {onResetSettings && (
+              <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={onResetSettings}>
+                <History className="h-3.5 w-3.5 mr-1.5" />
+                Reset
+              </Button>
+            )}
+          </div>
+        )}
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-3">
       {/* Formatting Controls Popover */}

@@ -1,10 +1,5 @@
 import { Model } from "@/types/interfaces";
 
-/**
- * Centralized model definitions for Takoto
- * These model definitions are used throughout the application
- * to ensure consistency in model information display
- */
 export const models: Model[] = [
   {
     value: "tiny",
@@ -12,7 +7,6 @@ export const models: Model[] = [
     description: "Fastest",
     size: "80MB",
     ram: "1GB",
-    image: "/hummingbird.png",
     details: "Lightweight and fast. Good for simple audio and low-resource devices.",
     isDownloaded: false,
   },
@@ -22,7 +16,6 @@ export const models: Model[] = [
     description: "Fastest for English",
     size: "80MB",
     ram: "1GB",
-    image: "/hummingbird.png",
     details: "Lightweight and fast. Good for simple audio, with enhanced English accuracy.",
     isDownloaded: false,
   },
@@ -32,7 +25,6 @@ export const models: Model[] = [
     description: "General use",
     size: "150MB",
     ram: "1GB",
-    image: "/otter.png",
     details: "Reliable for everyday transcription with good speed and accuracy.",
     isDownloaded: false,
   },
@@ -42,7 +34,6 @@ export const models: Model[] = [
     description: "General use for English",
     size: "150MB",
     ram: "1GB",
-    image: "/otter.png",
     details: "Reliable for everyday transcription, with enhanced English accuracy.",
     isDownloaded: false,
   },
@@ -52,7 +43,6 @@ export const models: Model[] = [
     description: "Balanced",
     size: "480MB",
     ram: "2GB",
-    image: "/fox.png",
     details: "Better accuracy than smaller models. Good for varied accents and conditions.",
     isDownloaded: false,
   },
@@ -62,7 +52,6 @@ export const models: Model[] = [
     description: "Balanced for English",
     size: "480MB",
     ram: "2GB",
-    image: "/fox.png",
     details: "Better accuracy than smaller models, with enhanced English performance.",
     isDownloaded: false,
   },
@@ -72,7 +61,6 @@ export const models: Model[] = [
     description: "Accurate",
     size: "1.5GB",
     ram: "5GB",
-    image: "/owl.png",
     details: "High accuracy for challenging audio. A balanced precision choice.",
     isDownloaded: false,
   },
@@ -82,18 +70,16 @@ export const models: Model[] = [
     description: "Accurate for English",
     size: "1.5GB",
     ram: "5GB",
-    image: "/owl.png",
     details: "High accuracy for challenging audio, with enhanced English precision.",
     isDownloaded: false,
   },
   {
     value: "large-v3-turbo",
     label: "Large (Turbo)",
-    description: "Reborn Speed",
+    description: "Fast & Accurate",
     size: "1.6GB",
     ram: "6GB",
-    image: "/phoenix.png",
-    details: "Swift and efficient like a phoenix rising. Delivers near-Large accuracy at significantly higher speed.",
+    details: "Near-Large accuracy at significantly higher speed.",
     isDownloaded: false,
   },
   {
@@ -102,8 +88,7 @@ export const models: Model[] = [
     description: "Max accuracy",
     size: "3.1GB",
     ram: "10GB",
-    image: "/elephant.png",
-    details: "Powerful and thorough as an elephant. Most accurate, best for complex audio or many speakers. Requires lots of RAM and a strong GPU.",
+    details: "Most accurate. Best for complex audio or many speakers. Requires lots of RAM.",
     isDownloaded: false,
   },
 ];

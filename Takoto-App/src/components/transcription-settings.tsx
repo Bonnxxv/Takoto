@@ -1,20 +1,16 @@
 import * as React from "react"
 import {
-    ChevronDown as ChevronDownIcon,
     Captions,
     RefreshCcw,
     LoaderCircle,
     CirclePlay,
-    Copy,
-    FolderOpen,
     XCircle,
+    Zap,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { Switch } from "@/components/ui/switch"
-import { Card } from "@/components/ui/card"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -40,9 +36,6 @@ import { TextFormattingCard } from "./settings-cards/text-formatting-card"
 import { SpeakerEditor } from "./speaker-editor"
 import { TranscriptionOptions } from "@/types/interfaces"
 import { WordTimestampsCard } from "./settings-cards/word-timestamps-card"
-import { Gauge } from "lucide-react"
-import { writeText } from "@tauri-apps/plugin-clipboard-manager"
-import { openPath } from "@tauri-apps/plugin-opener"
 
 interface TranscriptionSettingsProps {}
 
@@ -89,7 +82,6 @@ export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
 
     const [showSpeakerEditor, setShowSpeakerEditor] = React.useState(false)
     const [showNonDiarizedDialog, setShowNonDiarizedDialog] = React.useState(false)
-    const [copiedLogs, setCopiedLogs] = React.useState(false)
     const [transcriptionError, setTranscriptionError] = React.useState<string | null>(null)
 
     React.useEffect(() => {
@@ -170,28 +162,6 @@ export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
         setExportProgress(0)
     }
 
-    const handleCopyBackendLogs = async () => {
-        try {
-            const logs = await invoke<string>("get_backend_logs")
-            await writeText(logs || "")
-            setCopiedLogs(true)
-            setTimeout(() => setCopiedLogs(false), 1800)
-        } catch (e) {
-            console.error("Failed to copy backend logs:", e)
-        }
-    }
-
-    const handleOpenLogsFolder = async () => {
-        try {
-            const dir = await invoke<string>("get_log_dir")
-            if (dir) {
-                await openPath(dir)
-            }
-        } catch (e) {
-            console.error("Failed to open logs folder:", e)
-        }
-    }
-
     const handleCancelTranscription = async () => {
         console.log("Cancelling process...")
         cancelRequestedRef.current = true
@@ -219,238 +189,133 @@ export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
     return (
         <>
             <div className="flex flex-col h-full bg-background relative">
-                <div className="flex-1 p-4 pt-[69px] space-y-5 overflow-y-auto pb-[160px] no-scrollbar">
-                    <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-medium text-primary uppercase tracking-wider flex items-center gap-2">
-                                {settings.isStandaloneMode ? "Sumber File" : "DaVinci Resolve"}
-                            </h3>
-                            {!settings.isStandaloneMode && (
-                                <div className="flex items-center gap-2">
-                                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${!timelineInfo || !timelineInfo.timelineId ? 'bg-red-500' : 'bg-green-500'}`} />
-                                    <span className="text-xs font-medium text-muted-foreground truncate max-w-[120px]">
-                                        {!timelineInfo || !timelineInfo.timelineId ? 'Terputus' : 'Terhubung'}
-                                    </span>
-                                </div>
-                            )}
-                            <div className="flex-1 h-px bg-border ml-1"></div>
-                        </div>
-                        {settings.isStandaloneMode ? (
-                            <div>
-                                <AudioFileCard
-                                    selectedFile={fileInput}
-                                    onFileSelect={(file) => setFileInput(file)}
+                <div className="flex-1 p-4 pt-[69px] space-y-4 overflow-y-auto pb-[88px] no-scrollbar">
+
+                    {/* Sumber — selalu tampil di atas */}
+                    {settings.isStandaloneMode ? (
+                        <AudioFileCard
+                            selectedFile={fileInput}
+                            onFileSelect={(file) => setFileInput(file)}
+                        />
+                    ) : (
+                        <div className="rounded-xl border border-border overflow-hidden">
+                            <div className="flex items-center gap-2.5 px-3 py-2 bg-secondary">
+                                <img
+                                    src="/davinci-resolve-logo.png"
+                                    alt="DaVinci Resolve"
+                                    className="h-4 w-4 flex-shrink-0"
+                                    style={{ filter: timelineInfo?.timelineId ? undefined : "grayscale(100%)" }}
                                 />
+                                <span className="text-xs font-medium font-mono truncate flex-1 text-foreground">
+                                    {timelineInfo?.timelineId ? timelineInfo.name : 'Buka timeline di Resolve'}
+                                </span>
+                                <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${timelineInfo?.timelineId ? 'bg-green-500' : 'bg-red-500'}`} />
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            onClick={async () => {
+                                                setIsRefreshing(true);
+                                                await refresh();
+                                                setTimeout(() => setIsRefreshing(false), 400);
+                                            }}
+                                            variant="ghost"
+                                            size="sm"
+                                            className="h-6 w-6 p-0 flex-shrink-0"
+                                            disabled={isRefreshing}
+                                        >
+                                            <RefreshCcw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                                        </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="bottom" className="text-xs">Segarkan</TooltipContent>
+                                </Tooltip>
                             </div>
-                        ) : (
-                            <div className="space-y-3">
-                                <Card className="flex items-center gap-2 px-1.5 py-1 shadow-none bg-secondary">
-                                    <img
-                                        src="/davinci-resolve-logo.png"
-                                        alt="DaVinci Resolve Logo"
-                                        className="h-5 w-5 mr-0 inline-block"
-                                        style={{
-                                            verticalAlign: "middle",
-                                            filter: timelineInfo && timelineInfo.timelineId ? undefined : "grayscale(100%)",
-                                        }}
-                                    />
-                                    <div className="flex-1">
-                                        <div className="text-xs font-medium font-mono truncate dark:text-gray-300 text-gray-700">
-                                            {!timelineInfo || !timelineInfo.timelineId ? 'Buka timeline di Resolve.' : timelineInfo.name}
-                                        </div>
-                                    </div>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                onClick={async () => {
-                                                    setIsRefreshing(true);
-                                                    await refresh();
-                                                    setTimeout(() => setIsRefreshing(false), 400);
-                                                }}
-                                                variant="ghost"
-                                                size="sm"
-                                                className="h-6 w-6 p-0"
-                                                disabled={isRefreshing}
-                                            >
-                                                <RefreshCcw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                                            </Button>
-                                        </TooltipTrigger>
-                                        <TooltipContent side="bottom" className="text-xs">
-                                            Segarkan
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </Card>
+                            <div className="divide-y divide-border">
                                 <AudioInputCard
+                                    compact
                                     callRefresh={() => refresh()}
                                     selectedTracks={settings.selectedInputTracks}
                                     inputTracks={timelineInfo?.inputTracks || []}
-                                    onTracksChange={(tracks) => {
-                                        updateSetting("selectedInputTracks", tracks)
-                                    }}
+                                    onTracksChange={(tracks) => updateSetting("selectedInputTracks", tracks)}
                                 />
                                 <SubtitleSettingsCard
+                                    compact
                                     selectedTemplate={settings.selectedTemplate}
-                                    onTemplateChange={(template) => {
-                                        updateSetting("selectedTemplate", template)
-                                    }}
+                                    onTemplateChange={(template) => updateSetting("selectedTemplate", template)}
                                     outputTracks={timelineInfo?.outputTracks || []}
                                     templates={timelineInfo?.templates || []}
                                     selectedOutputTrack={settings.selectedOutputTrack}
-                                    onOutputTrackChange={(track) => {
-                                        updateSetting("selectedOutputTrack", track)
-                                    }}
+                                    onOutputTrackChange={(track) => updateSetting("selectedOutputTrack", track)}
                                 />
                             </div>
-                        )}
+                        </div>
+                    )}
+
+                    {/* Pemrosesan */}
+                    <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
+                        <LanguageSettingsCard
+                            compact
+                            sourceLanguage={settings.language}
+                            translate={settings.translate}
+                            onSourceLanguageChange={(language) => updateSetting('language', language)}
+                            onTranslateChange={(translate) => updateSetting('translate', translate)}
+                        />
+                        <SpeakerLabelingCard
+                            compact
+                            diarize={settings.enableDiarize}
+                            maxSpeakers={settings.maxSpeakers}
+                            onDiarizeChange={(checked) => updateSetting("enableDiarize", checked)}
+                            onMaxSpeakersChange={(value) => updateSetting("maxSpeakers", value)}
+                        />
+                        <ModelSelectionCard
+                            compact
+                            language={settings.language}
+                            selectedModel={settings.model}
+                            models={modelsState}
+                            downloadingModel={downloadingModel}
+                            downloadProgress={downloadProgress}
+                            onModelChange={(model) => updateSetting('model', model)}
+                            onDeleteModel={(model) => handleDeleteModel(model)}
+                        />
                     </div>
 
-                    <Collapsible defaultOpen className="space-y-3">
-                        <div className="flex items-center gap-4">
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
-                                    <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
-                                        Pemrosesan
-                                    </h3>
-                                </Button>
-                            </CollapsibleTrigger>
-                            <div className="flex-1 h-px bg-border"></div>
+                    {/* Eksperimental */}
+                    <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
+                        <WordTimestampsCard
+                            compact
+                            enableDTW={settings.enableDTW}
+                            onEnableDTWChange={(checked) => updateSetting("enableDTW", checked)}
+                        />
+                        <div className="bg-card flex items-center gap-3 px-3.5 py-3">
+                            <Zap className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                            <span className="text-sm flex-1">Akselerasi GPU</span>
+                            <Switch checked={settings.enableGpu} onCheckedChange={(checked) => updateSetting("enableGpu", checked)} />
                         </div>
-                        <CollapsibleContent>
-                            <div className="space-y-3">
-                                <LanguageSettingsCard
-                                    sourceLanguage={settings.language}
-                                    translate={settings.translate}
-                                    onSourceLanguageChange={(language: string) => {
-                                        updateSetting('language', language);
-                                    }}
-                                    onTranslateChange={(translate: boolean) => {
-                                        updateSetting('translate', translate);
-                                    }}
-                                />
+                    </div>
 
-                                <SpeakerLabelingCard
-                                    diarize={settings.enableDiarize}
-                                    maxSpeakers={settings.maxSpeakers}
-                                    onDiarizeChange={(checked) => updateSetting("enableDiarize", checked)}
-                                    onMaxSpeakersChange={(value) => updateSetting("maxSpeakers", value)}
-                                />
-
-                                <ModelSelectionCard
-                                    language={settings.language}
-                                    selectedModel={settings.model}
-                                    models={modelsState}
-                                    downloadingModel={downloadingModel}
-                                    downloadProgress={downloadProgress}
-                                    onModelChange={(model) => updateSetting('model', model)}
-                                    onDeleteModel={(model) => handleDeleteModel(model)}
-                                />
-                            </div>
-                        </CollapsibleContent>
-                    </Collapsible>
-
-                    <Collapsible defaultOpen className="space-y-3">
-                        <div className="flex items-center gap-4">
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
-                                    <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
-                                        Eksperimental
-                                    </h3>
-                                </Button>
-                            </CollapsibleTrigger>
-                            <div className="flex-1 h-px bg-border"></div>
-                        </div>
-                        <CollapsibleContent>
-                            <div className="space-y-3">
-                                <WordTimestampsCard
-                                    enableDTW={settings.enableDTW}
-                                    onEnableDTWChange={(checked) => updateSetting("enableDTW", checked)}
-                                />
-
-                                <Card className="p-3.5 shadow-none relative">
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
-                                                <Gauge className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                                            </div>
-                                            <div>
-                                                <div className="flex items-center gap-1">
-                                                    <p className="text-sm font-medium">Akselerasi GPU</p>
-                                                </div>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Meningkatkan kecepatan transkripsi
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <Switch checked={settings.enableGpu} onCheckedChange={(checked) => updateSetting("enableGpu", checked)} />
-                                    </div>
-                                </Card>
-                            </div>
-                        </CollapsibleContent>
-                    </Collapsible>
-
-                    <Collapsible defaultOpen className="space-y-3">
-                        <div className="flex items-center gap-4">
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
-                                    <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
-                                        Format Teks
-                                    </h3>
-                                </Button>
-                            </CollapsibleTrigger>
-                            <div className="flex-1 h-px bg-border"></div>
-                        </div>
-                        <CollapsibleContent>
-                            <TextFormattingCard
-                                maxWordsPerLine={settings.maxWordsPerLine}
-                                maxCharsPerLine={settings.maxCharsPerLine}
-                                maxLinesPerSubtitle={settings.maxLinesPerSubtitle}
-                                textCase={settings.textCase}
-                                removePunctuation={settings.removePunctuation}
-                                splitOnPunctuation={settings.splitOnPunctuation}
-                                enableCensor={settings.enableCensor}
-                                censoredWords={settings.censoredWords}
-                                onMaxWordsPerLineChange={(value) => updateSetting("maxWordsPerLine", value)}
-                                onMaxCharsPerLineChange={(value) => updateSetting("maxCharsPerLine", value)}
-                                onMaxLinesPerSubtitleChange={(value) => updateSetting("maxLinesPerSubtitle", value)}
-                                onTextCaseChange={(textCase) => updateSetting("textCase", textCase)}
-                                onRemovePunctuationChange={(checked) => updateSetting("removePunctuation", checked)}
-                                onSplitOnPunctuationChange={(checked) => updateSetting("splitOnPunctuation", checked)}
-                                onEnableCensorChange={(checked) => updateSetting("enableCensor", checked)}
-                                onCensoredWordsChange={(words) => updateSetting("censoredWords", words)}
-                                onResetSettings={resetSettings}
-                                isWalkthroughMode={false}
-                            />
-                        </CollapsibleContent>
-                    </Collapsible>
-
-                    <Collapsible defaultOpen className="space-y-3">
-                        <div className="flex items-center gap-4">
-                            <CollapsibleTrigger asChild>
-                                <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
-                                    <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
-                                        Tentang
-                                    </h3>
-                                </Button>
-                            </CollapsibleTrigger>
-                            <div className="flex-1 h-px bg-border"></div>
-                        </div>
-                        <CollapsibleContent>
-                            <div className="space-y-3.5">
-                                <div className="space-y-2">
-                                    <h4 className="text-sm font-medium">Developer:</h4>
-                                    <ul className="text-sm text-muted-foreground space-y-1 ml-4">
-                                        <li>• Bona Tua Briyan Joli Simare Mare</li>
-                                        <li>• Yosia Gabriel</li>
-                                        <li>• Tsabit Alauddin Kuswandaru</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </CollapsibleContent>
-                    </Collapsible>
+                    {/* Format Teks */}
+                    <div className="rounded-xl border border-border overflow-hidden">
+                        <TextFormattingCard
+                            compact
+                            maxWordsPerLine={settings.maxWordsPerLine}
+                            maxCharsPerLine={settings.maxCharsPerLine}
+                            maxLinesPerSubtitle={settings.maxLinesPerSubtitle}
+                            textCase={settings.textCase}
+                            removePunctuation={settings.removePunctuation}
+                            splitOnPunctuation={settings.splitOnPunctuation}
+                            enableCensor={settings.enableCensor}
+                            censoredWords={settings.censoredWords}
+                            onMaxWordsPerLineChange={(value) => updateSetting("maxWordsPerLine", value)}
+                            onMaxCharsPerLineChange={(value) => updateSetting("maxCharsPerLine", value)}
+                            onMaxLinesPerSubtitleChange={(value) => updateSetting("maxLinesPerSubtitle", value)}
+                            onTextCaseChange={(textCase) => updateSetting("textCase", textCase)}
+                            onRemovePunctuationChange={(checked) => updateSetting("removePunctuation", checked)}
+                            onSplitOnPunctuationChange={(checked) => updateSetting("splitOnPunctuation", checked)}
+                            onEnableCensorChange={(checked) => updateSetting("enableCensor", checked)}
+                            onCensoredWordsChange={(words) => updateSetting("censoredWords", words)}
+                            onResetSettings={resetSettings}
+                            isWalkthroughMode={false}
+                        />
+                    </div>
                 </div>
 
                 <div className="absolute bottom-0 left-0 right-0 p-4 border-t frosted-glass shadow-apple-md space-y-3.5 z-10">
@@ -522,17 +387,6 @@ export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
                             </div>
                         </div>
                     )}
-
-                    <div className="grid grid-cols-2 gap-2">
-                        <Button variant="outline" onClick={handleCopyBackendLogs} className="w-full">
-                            <Copy className="h-4 w-4 mr-2" />
-                            {copiedLogs ? "Log Disalin" : "Salin Log Backend"}
-                        </Button>
-                        <Button variant="outline" onClick={handleOpenLogsFolder} className="w-full">
-                            <FolderOpen className="h-4 w-4 mr-2" />
-                            Buka Folder Log
-                        </Button>
-                    </div>
 
                     {isMobile && (
                         <Button onClick={() => setShowMobileSubtitles(true)} variant="secondary" className="w-full">

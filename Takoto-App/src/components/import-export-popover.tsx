@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Download, Upload, FileUp, FileJson, Captions, Speech, Share2, CheckCircle2, Loader2 } from "lucide-react"
+import { Download, Upload, FileUp, FileJson, Captions, Speech, Share2, CheckCircle2, Loader2, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -20,9 +20,10 @@ interface ImportExportPopoverProps {
     onImport: () => Promise<void>
     onExport: (format: ExportFormat, includeSpeakerLabels: boolean) => Promise<void>
     hasSubtitles: boolean
+    compact?: boolean
 }
 
-export function ImportExportPopover({ onImport, onExport, hasSubtitles }: ImportExportPopoverProps) {
+export function ImportExportPopover({ onImport, onExport, hasSubtitles, compact = false }: ImportExportPopoverProps) {
     const [isOpen, setIsOpen] = React.useState(false)
     const [selectedFile, setSelectedFile] = React.useState<string | null>(null)
     const [exportFormat, setExportFormat] = React.useState<ExportFormat>('srt')
@@ -116,10 +117,18 @@ export function ImportExportPopover({ onImport, onExport, hasSubtitles }: Import
     return (
         <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); setShareProgress(null); setShareSuccess(false); }}>
             <DialogTrigger asChild>
-                <Button variant="outline" className="w-full flex items-center justify-center gap-2">
-                    <Upload className="h-4 w-4" />
-                    Impor / Ekspor
-                </Button>
+                {compact ? (
+                    <button className="bg-card w-full flex items-center gap-3 px-3.5 py-3 text-left hover:bg-muted/50 transition-colors">
+                        <Share2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                        <span className="text-sm flex-1">Impor / Ekspor</span>
+                        <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                    </button>
+                ) : (
+                    <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+                        <Upload className="h-4 w-4" />
+                        Impor / Ekspor
+                    </Button>
+                )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-md p-5">
                 <DialogHeader className="mb-2">

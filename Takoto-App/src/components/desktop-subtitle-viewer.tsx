@@ -1,11 +1,15 @@
 import * as React from "react"
-import { Layers2, Users, X, Loader2, Trash2, Captions, Search } from "lucide-react"
+import { Layers2, Users, X, Loader2, Trash2, Captions, Search, ChevronRight, MoreHorizontal, Copy, FolderOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SubtitleList } from "@/components/subtitle-list"
 import { useGlobal } from "@/contexts/GlobalContext"
 import { ImportExportPopover } from "@/components/import-export-popover"
 import { SpeakerEditor } from "@/components/speaker-editor"
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import { invoke } from "@tauri-apps/api/core"
+import { writeText } from "@tauri-apps/plugin-clipboard-manager"
+import { openPath } from "@tauri-apps/plugin-opener"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,14 +30,33 @@ export function DesktopSubtitleViewer() {
   
   const [showSpeakerEditor, setShowSpeakerEditor] = React.useState(false)
   const [isPushing, setIsPushing] = React.useState(false)
-  
-  // State untuk dialog konfirmasi hapus
   const [showClearConfirm, setShowClearConfirm] = React.useState(false)
+  const [copiedLogs, setCopiedLogs] = React.useState(false)
+
+  const handleCopyBackendLogs = async () => {
+    try {
+      const logs = await invoke<string>("get_backend_logs")
+      await writeText(logs || "")
+      setCopiedLogs(true)
+      setTimeout(() => setCopiedLogs(false), 1800)
+    } catch (e) {
+      console.error("Failed to copy backend logs:", e)
+    }
+  }
+
+  const handleOpenLogsFolder = async () => {
+    try {
+      const dir = await invoke<string>("get_log_dir")
+      if (dir) await openPath(dir)
+    } catch (e) {
+      console.error("Failed to open logs folder:", e)
+    }
+  }
 
   return (
     <div className="flex flex-col h-full border-l bg-sidebar relative">
 
-      {/* Symmetrical Header */}
+      {/* Header */}
       <header className="absolute top-0 left-0 right-0 flex h-[53px] shrink-0 items-center justify-between border-b border-border frosted-glass px-4 py-2.5 z-20 min-w-0 shadow-apple-sm">
         <span className="text-sm font-semibold flex items-center gap-2 text-foreground">
           <Captions className="h-4.5 w-4.5 text-primary" />
@@ -45,6 +68,45 @@ export function DesktopSubtitleViewer() {
               {subtitles.length} Baris
             </span>
           )}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-0 overflow-hidden" align="end">
+              {/* Logo + App info */}
+              <div className="flex flex-col items-center px-5 pt-5 pb-4 text-center">
+                <img src="/takoto-logo.png" alt="Takoto" className="w-16 h-16 rounded-2xl mb-3 shadow-apple-md" />
+                <p className="text-base font-bold tracking-tight">Takoto</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Versi 3.5</p>
+              </div>
+              {/* Key-value rows */}
+              <div className="border-t border-border px-4 py-3 space-y-1.5">
+                <div className="flex gap-3 text-xs">
+                  <span className="text-muted-foreground font-medium shrink-0 w-16 text-right">Dibuat oleh</span>
+                  <span className="text-foreground">Bona Tua, Tsabit, dan Yosia Gabriel</span>
+                </div>
+              </div>
+              {/* Log buttons */}
+              <div className="border-t border-border divide-y divide-border">
+                <button
+                  onClick={handleCopyBackendLogs}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors text-left"
+                >
+                  <Copy className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                  {copiedLogs ? "Log Disalin!" : "Salin Log Backend"}
+                </button>
+                <button
+                  onClick={handleOpenLogsFolder}
+                  className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-muted/50 transition-colors text-left"
+                >
+                  <FolderOpen className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                  Buka Folder Log
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </header>
 
@@ -52,30 +114,31 @@ export function DesktopSubtitleViewer() {
       <div className="flex-1 overflow-y-auto min-h-0 px-0 pt-[53px] pb-[68px] no-scrollbar flex flex-col">
         
         {/* Action Buttons Area */}
-        <div className="shrink-0 px-4 pt-4 pb-0 flex flex-col gap-3">
-          <div className="flex gap-2">
+        <div className="shrink-0 px-4 pt-4 pb-0">
+          <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
             <ImportExportPopover
+              compact
               onImport={importSubtitles}
               onExport={exportSubtitlesAs}
               hasSubtitles={subtitles.length > 0}
             />
-            <Button variant="outline" className="w-full" onClick={() => setShowSpeakerEditor(true)}>
-              <Users className="w-4 h-4 mr-2" />
-              Speakers
-            </Button>
+            <button
+              className="bg-card w-full flex items-center gap-3 px-3.5 py-3 text-left hover:bg-muted/50 transition-colors"
+              onClick={() => setShowSpeakerEditor(true)}
+            >
+              <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm flex-1">Speakers</span>
+              <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            </button>
+            <button
+              className="bg-card w-full flex items-center gap-3 px-3.5 py-3 text-left hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              onClick={() => setShowClearConfirm(true)}
+              disabled={subtitles.length === 0}
+            >
+              <Trash2 className="h-4 w-4 text-red-500 flex-shrink-0" />
+              <span className="text-sm flex-1 text-red-600 dark:text-red-400">Hapus List Sub</span>
+            </button>
           </div>
-          
-          {/* Tombol Hapus List Sub di bawah Impor/Ekspor & Speakers */}
-          <Button
-            variant="outline"
-            className="w-full text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 border-red-200 dark:border-red-900/50"
-            onClick={() => setShowClearConfirm(true)}
-            disabled={subtitles.length === 0}
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Hapus List Sub
-          </Button>
-          
           <SpeakerEditor afterTranscription={false} open={showSpeakerEditor} onOpenChange={() => setShowSpeakerEditor(false)} />
         </div>
 
@@ -130,7 +193,7 @@ export function DesktopSubtitleViewer() {
         <div className="absolute bottom-0 left-0 right-0 p-4 flex justify-end gap-2 border-t frosted-glass shadow-apple-md z-10">
           <Button
             variant="default"
-            size="default"
+            size="lg"
             className="w-full"
             disabled={isPushing}
             onClick={async () => {

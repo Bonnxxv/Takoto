@@ -71,7 +71,6 @@ export interface Model {
     description: string
     size: string
     ram: string
-    image: string
     details: string
     isDownloaded: boolean
 }

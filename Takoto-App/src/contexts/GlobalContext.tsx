@@ -14,6 +14,8 @@ import { getTimelineInfo, cancelExport, addSubtitlesToTimeline } from '@/api/res
 import { generateTranscriptFilename, readTranscript, saveTranscript, updateTranscript } from '../utils/fileUtils';
 import { generateSrt, parseSrt } from '@/utils/srtUtils';
 import { models } from '@/lib/models';
+import { toast } from 'sonner';
+import { revealItemInDir } from '@tauri-apps/plugin-opener';
 
 interface GlobalContextType {
   settings: Settings;
@@ -308,12 +310,12 @@ export function GlobalProvider({ children }: GlobalProviderProps) {
         }
 
         await writeTextFile(filePath, srtData);
-        console.log('SRT file saved successfully to', filePath);
+        const fileName = filePath.split('/').pop() ?? filePath;
+        toast.success('File SRT berhasil disimpan', {
+          description: fileName,
+          action: { label: 'Buka Folder', onClick: () => revealItemInDir(filePath) },
+        });
       } else {
-        // Export as JSON
-        console.log('Generating JSON data from subtitles (first 3 items):', subtitles.slice(0, 3));
-
-        // Create a structured JSON object similar to what's used internally
         const jsonData = {
           createdAt: new Date().toISOString(),
           segments: subtitles.map((segment, index) => ({
@@ -328,10 +330,15 @@ export function GlobalProvider({ children }: GlobalProviderProps) {
 
         const jsonString = JSON.stringify(jsonData, null, 2);
         await writeTextFile(filePath, jsonString);
-        console.log('JSON file saved successfully to', filePath);
+        const fileName = filePath.split('/').pop() ?? filePath;
+        toast.success('File JSON berhasil disimpan', {
+          description: fileName,
+          action: { label: 'Buka Folder', onClick: () => revealItemInDir(filePath) },
+        });
       }
     } catch (error) {
       console.error(`Failed to save ${format} file`, error);
+      toast.error('Gagal menyimpan file', { description: String(error) });
     }
   }
 

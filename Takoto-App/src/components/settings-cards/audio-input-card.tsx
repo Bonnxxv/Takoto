@@ -12,11 +12,65 @@ interface AudioInputCardProps {
   onTracksChange: (tracks: string[]) => void
   callRefresh: () => void
   walkthroughMode?: boolean
+  compact?: boolean
   inputTracks?: Track[]
 }
 
-export const AudioInputCard = ({ selectedTracks, onTracksChange, callRefresh, walkthroughMode = false, inputTracks = [] }: AudioInputCardProps) => {
+export const AudioInputCard = ({ selectedTracks, onTracksChange, callRefresh, walkthroughMode = false, compact = false, inputTracks = [] }: AudioInputCardProps) => {
   const [openTrackSelector, setOpenTrackSelector] = React.useState(false)
+
+  if (compact && !walkthroughMode) {
+    return (
+      <div className="bg-card px-3.5 py-3 flex items-center gap-3">
+        <AudioLines className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <span className="text-sm flex-1 text-foreground">Input Audio</span>
+        <Popover open={openTrackSelector} onOpenChange={setOpenTrackSelector}>
+          <PopoverTrigger asChild onClick={() => callRefresh()}>
+            <Button variant="outline" size="sm" role="combobox" aria-expanded={openTrackSelector} className="w-[140px] h-8 justify-between font-normal text-xs">
+              {selectedTracks.length === 0 ? "Pilih trek..." : selectedTracks.length === 1 ? `Trek ${selectedTracks[0]}` : `${selectedTracks.length} trek`}
+              <ChevronsUpDown className="ml-1 h-3 w-3 shrink-0 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] p-0 overflow-hidden" align="end">
+            {inputTracks.length > 0 ? (
+              <div className="px-4 py-2 bg-gradient-to-br from-red-50/80 to-orange-50/80 dark:from-red-950/50 dark:to-orange-950/50 border-b">
+                <div className="flex items-center justify-between min-h-[28px]">
+                  <span className="text-sm text-muted-foreground">
+                    {selectedTracks.length > 0 ? (selectedTracks.length === 1 ? `${inputTracks.find(t => t.value === selectedTracks[0])?.label || `Trek ${selectedTracks[0]}`} dipilih` : `${selectedTracks.length} trek dipilih`) : 'Tidak ada trek dipilih'}
+                  </span>
+                  <Button size="sm" variant="ghost" className="text-xs h-7 px-2" onClick={() => { selectedTracks.length === inputTracks.length ? onTracksChange([]) : onTracksChange(inputTracks.map(t => t.value)) }}>
+                    {selectedTracks.length === inputTracks.length ? "Hapus Semua" : "Pilih Semua"}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="px-4 py-3 bg-red-50/30 dark:bg-red-900/10 border-b">
+                <p className="text-sm text-center text-muted-foreground">Tidak ada trek audio ditemukan.</p>
+              </div>
+            )}
+            <ScrollArea style={{ maxHeight: '200px', width: '100%' }}>
+              <div className="flex flex-col gap-1 p-2">
+                {inputTracks.map((track) => {
+                  const trackId = track.value;
+                  const isChecked = selectedTracks.includes(trackId);
+                  return (
+                    <div key={trackId} className={`flex items-center gap-3 py-2 px-3 rounded-lg border cursor-pointer select-none ${isChecked ? 'bg-red-50/50 dark:bg-red-950/40 border-red-200 dark:border-red-800' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50 border-zinc-100 dark:border-zinc-800'}`}
+                      onClick={() => { isChecked ? onTracksChange(selectedTracks.filter(id => id !== trackId)) : onTracksChange([...selectedTracks, trackId]) }}>
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center ${isChecked ? 'bg-red-100 dark:bg-red-900/50' : 'bg-zinc-100 dark:bg-zinc-800'}`}>
+                        <AudioLines className={`h-3.5 w-3.5 ${isChecked ? 'text-red-600 dark:text-red-400' : 'text-zinc-500'}`} />
+                      </div>
+                      <span className={`text-sm font-medium flex-1 ${isChecked ? 'text-red-600 dark:text-red-400' : ''}`}>{track.label}</span>
+                      <Checkbox id={`track-${trackId}`} checked={isChecked} tabIndex={-1} onCheckedChange={(checked) => { checked ? onTracksChange([...selectedTracks, trackId]) : onTracksChange(selectedTracks.filter(id => id !== trackId)) }} />
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          </PopoverContent>
+        </Popover>
+      </div>
+    )
+  }
 
   return (
     <Card className="p-3.5 shadow-none">

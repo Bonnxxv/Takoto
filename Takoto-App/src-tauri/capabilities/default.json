@@ -77,20 +77,8 @@
       ]
     },
     "dialog:default",
-    {
-      "identifier": "dialog:allow-save",
-      "allow": [
-        {
-          "path": "$DESKTOP/*"
-        },
-        {
-          "path": "$DOCUMENT/*"
-        },
-        {
-          "path": "$DOWNLOAD/*"
-        }
-      ]
-    },
+    "dialog:allow-open",
+    "dialog:allow-save",
     "store:default",
     "core:window:default",
     {

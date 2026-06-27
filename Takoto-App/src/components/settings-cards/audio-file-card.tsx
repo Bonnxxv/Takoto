@@ -1,5 +1,5 @@
 import * as React from "react"
-import { FileUp, Upload, FolderOpen, X } from "lucide-react"
+import { Upload, FolderOpen, X } from "lucide-react"
 import { revealItemInDir } from "@tauri-apps/plugin-opener"
 import { Button } from "@/components/ui/button"
 
@@ -35,45 +35,43 @@ export const AudioFileCard = ({ selectedFile, onFileSelect }: AudioFileCardProps
     };
   }, [onFileSelect]);
   const handleFileSelect = async () => {
-    const file = await open({
-      multiple: false,
-      directory: false,
-      filters: [{
-        name: 'Media Files (ffmpeg-supported)',
-        extensions: [
-          'wav', 'mp3', 'm4a', 'flac', 'ogg', 'aac', 'mp4', 'mov', 'mkv', 'webm', 'avi', 'wmv', 'mpeg', 'mpg', 'm4v', '3gp', 'aiff', 'opus', 'alac'
-        ]
-      }],
-      defaultPath: await downloadDir()
-    })
-    onFileSelect(file)
+    try {
+      let defaultPath: string | undefined
+      try { defaultPath = await downloadDir() } catch {}
+
+      const file = await open({
+        multiple: false,
+        directory: false,
+        filters: [{
+          name: 'Media Files (ffmpeg-supported)',
+          extensions: [
+            'wav', 'mp3', 'm4a', 'flac', 'ogg', 'aac', 'mp4', 'mov', 'mkv', 'webm', 'avi', 'wmv', 'mpeg', 'mpg', 'm4v', '3gp', 'aiff', 'opus', 'alac'
+          ]
+        }],
+        defaultPath
+      })
+      onFileSelect(file as string | null)
+    } catch (e) {
+      console.error("Failed to open file dialog:", e)
+    }
   }
 
   return (
-    <Card
-      className="p-3.5 shadow-none relative"
-    >
-      <div className="flex items-center gap-3 mb-2">
-        <div className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30">
-          <FileUp className="h-5 w-5 text-red-500" />
-        </div>
-        <div>
-          <p className="text-sm font-medium">Transkrip File</p>
-          <p className="text-xs text-muted-foreground">Buat subtitle dari audio atau video apa pun</p>
-        </div>
-      </div>
-      {/* Drag and Drop Area */}
+    <Card className="p-3.5 shadow-none relative">
+      {/* Compact drop zone — icon + text inline, no separate header */}
       <div
-        className="h-[120px] flex flex-col items-center justify-center border-2 border-dashed rounded-lg py-5 px-2 mt-4 bg-muted/10 cursor-pointer transition-colors hover:bg-muted/60 hover:dark:bg-muted/20 outline-none"
+        className="flex items-center gap-3 border-2 border-dashed rounded-lg px-3 py-3 cursor-pointer transition-colors bg-muted/10 hover:bg-muted/60 hover:dark:bg-muted/20 outline-none"
         tabIndex={0}
         role="button"
         aria-label="Drop audio file here or click to select"
         onClick={handleFileSelect}
         onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleFileSelect(); }}
       >
-        <Upload className="h-7 w-7 mb-1 text-muted-foreground" />
-        <span className="text-sm font-medium text-muted-foreground">Letakkan file di sini atau klik untuk memilih</span>
-        <span className="text-xs text-muted-foreground mt-1">Mendukung sebagian besar format media</span>
+        <Upload className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-muted-foreground">Letakkan file atau klik untuk memilih</p>
+          <p className="text-xs text-muted-foreground/70">Audio atau video — sebagian besar format didukung</p>
+        </div>
       </div>
 
       {selectedFile && (
