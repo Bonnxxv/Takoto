@@ -234,6 +234,9 @@ jobs:
         unzip -jo "$ZIP_NAME"
         rm -f "$ZIP_NAME"
 
+        # ffprobe not in tmoroney's Windows release — copy ffmpeg as placeholder
+        cp "ffmpeg-x86_64-pc-windows-msvc.exe" "ffprobe-x86_64-pc-windows-msvc.exe"
+
     - name: Build Tauri (Windows)
       env:
         TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
