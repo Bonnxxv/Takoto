@@ -82,7 +82,7 @@ jobs:
 
     - name: Download ffmpeg/ffprobe binaries
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         set -euo pipefail
         mkdir -p Takoto-App/src-tauri/binaries
@@ -176,7 +176,7 @@ jobs:
         files: |
           Takoto-Mac-${{ matrix.pkg_suffix }}.pkg
           release-artifacts/*
-        token: ${{ secrets.GH_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         tag_name: ${{ env.TAG }}
 
   build-windows:
@@ -194,6 +194,7 @@ jobs:
     - name: Install Rust stable
       uses: dtolnay/rust-toolchain@stable
       with:
+        toolchain: stable
         targets: x86_64-pc-windows-msvc
 
     - name: Install npm dependencies
@@ -203,7 +204,7 @@ jobs:
 
     - name: Download ffmpeg/ffprobe binaries (Windows)
       env:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       shell: bash
       run: |
         set -euo pipefail
@@ -255,7 +256,7 @@ jobs:
       uses: softprops/action-gh-release@v2
       with:
         files: release-artifacts/*
-        token: ${{ secrets.GH_TOKEN }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         tag_name: ${{ env.TAG }}
 
   build-linux:
@@ -290,7 +291,7 @@ jobs:
 
       - name: Download ffmpeg/ffprobe binaries (Linux)
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p Takoto-App/src-tauri/binaries
@@ -325,7 +326,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: "*.deb"
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.TAG }}
 
   compose-latest-json:
@@ -342,7 +343,7 @@ jobs:
       - name: Compose latest.json
         env:
           TAG: ${{ env.TAG }}
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           mkdir -p latest
@@ -406,5 +407,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: latest.json
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.TAG }}
