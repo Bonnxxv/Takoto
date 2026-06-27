@@ -1,10 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use reqwest::Client;
 use serde_json::json;
 use std::time::Duration;
-use tauri::{EventLoopMessage, RunEvent};
+use tauri::RunEvent;
+#[cfg(not(target_os = "windows"))]
+use reqwest::Client;
 use tauri::Emitter; // for app.emit
 use std::sync::atomic::{AtomicBool, Ordering as AtomicOrdering};
 
@@ -57,7 +58,6 @@ fn main() {
             {
                 let app_handle = app.handle().clone();
                 tauri::async_runtime::spawn(async move {
-                    use tauri::Manager;
                     let mut ffmpeg_ok = false;
                     let mut ffprobe_ok = false;
                     let mut ffmpeg_version = String::new();

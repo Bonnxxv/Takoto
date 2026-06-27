@@ -6,11 +6,6 @@ use tauri::{AppHandle, Runtime};
 use tauri_plugin_shell::ShellExt; // You need to bring the ShellExt trait into scope // Command is now accessed via the app handle
 use tokio::process::Command as TokioCommand;
 
-#[cfg(windows)]
-use std::os::windows::process::CommandExt;
-
-#[cfg(windows)]
-const CREATE_NO_WINDOW: u32 = 0x08000000;
 
 // --- Helpers: stream probing and energy measurement ---
 // List available audio stream indices using ffprobe.

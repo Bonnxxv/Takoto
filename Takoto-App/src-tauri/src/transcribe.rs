@@ -18,7 +18,7 @@ use tauri::{command, AppHandle, Emitter, Manager, Runtime};
 use whisper_rs::DtwMode;
 use whisper_rs::DtwModelPreset;
 use whisper_rs::DtwParameters;
-use whisper_rs::{FullParams, SamplingStrategy, WhisperContextParameters, SegmentCallbackData, WhisperContext, WhisperState, WhisperSegment, WhisperTokenData};
+use whisper_rs::{FullParams, SamplingStrategy, WhisperContextParameters, WhisperContext, WhisperSegment};
 use regex::Regex;
 use once_cell::sync::Lazy;
 
@@ -629,7 +629,7 @@ fn process_and_align_segments(
         // Compute embedding for this segment
         let (embedding_vec, speaker_id) = match extractor.compute(&diar_seg.samples) {
             Ok(embedding_result) => {
-                let embedding_vec: Vec<f32> = embedding_result.collect();
+                let embedding_vec: Vec<f32> = embedding_result.into_iter().collect();
 
                 // Find the speaker using the same logic as the original pipeline
                 let speaker_id =
