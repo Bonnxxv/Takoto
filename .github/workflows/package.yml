@@ -78,7 +78,7 @@ jobs:
     - name: Install Dependencies
       run: |
         cd Takoto-App
-        npm ci
+        npm install
 
     - name: Download ffmpeg/ffprobe binaries
       env:
@@ -200,7 +200,7 @@ jobs:
     - name: Install npm dependencies
       run: |
         cd Takoto-App
-        npm ci
+        npm install
 
     - name: Download ffmpeg/ffprobe binaries (Windows)
       env:
@@ -287,7 +287,7 @@ jobs:
       - name: Install npm dependencies
         run: |
           cd Takoto-App
-          npm ci
+          npm install
 
       - name: Download ffmpeg/ffprobe binaries (Linux)
         env:
