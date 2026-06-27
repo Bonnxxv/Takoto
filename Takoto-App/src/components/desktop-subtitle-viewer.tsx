@@ -1,12 +1,12 @@
 import * as React from "react"
-import { Layers2, Users, X, Loader2, Trash2, Captions, Search, ChevronRight, Info, Copy, FolderOpen, Zap, Speech } from "lucide-react"
+import { Layers2, Users, X, Loader2, Trash2, Captions, Search, ChevronRight, Info, Copy, FolderOpen, Zap, Speech, FileUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SubtitleList } from "@/components/subtitle-list"
 import { useGlobal } from "@/contexts/GlobalContext"
-import { ImportExportPopover } from "@/components/import-export-popover"
+import { ShareDialog } from "@/components/import-export-popover"
 import { SpeakerEditor } from "@/components/speaker-editor"
 import { Dialog, DialogTrigger, DialogContent } from "@/components/ui/dialog"
 import { invoke } from "@tauri-apps/api/core"
@@ -168,13 +168,18 @@ export function DesktopSubtitleViewer() {
         {/* Action Buttons Area */}
         <div className="shrink-0 px-4 pt-4 pb-0 space-y-2">
           <div className="flex gap-2">
-            <div className="flex-1">
-              <ImportExportPopover
-                onImport={importSubtitles}
-                onExport={exportSubtitlesAs}
-                hasSubtitles={subtitles.length > 0}
-              />
-            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={importSubtitles}
+              title="Impor subtitle"
+            >
+              <FileUp className="h-4 w-4" />
+            </Button>
+            <ShareDialog
+              onExport={exportSubtitlesAs}
+              hasSubtitles={subtitles.length > 0}
+            />
             <Button
               variant="outline"
               className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 border-border"

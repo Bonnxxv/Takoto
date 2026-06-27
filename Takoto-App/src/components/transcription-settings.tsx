@@ -418,9 +418,9 @@ export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
                             </Button>
                         </AlertDialogCancel>
                         <AlertDialogAction asChild>
-                            <Button onClick={() => {
+                            <Button onClick={async () => {
                                 setShowNonDiarizedDialog(false)
-                                pushToTimeline()
+                                await pushToTimeline()
                             }}>
                                 Add to Timeline
                             </Button>

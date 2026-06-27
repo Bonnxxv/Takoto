@@ -56,17 +56,21 @@ export async function getTimelineInfo() {
 
 export async function addSubtitlesToTimeline(filename: string, currentTemplate: string, outputTrack: string) {
   const filePath = await getTranscriptPath(filename);
+  const payload = {
+    func: "AddSubtitles",
+    filePath,
+    templateName: currentTemplate,
+    trackIndex: outputTrack,
+  };
+  console.log('[addSubtitlesToTimeline] sending payload:', payload);
   const response = await fetch(resolveAPI, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      func: "AddSubtitles",
-      filePath,
-      templateName: currentTemplate,
-      trackIndex: outputTrack,
-    }),
+    body: JSON.stringify(payload),
   });
-  return response.json();
+  const data = await response.json();
+  console.log('[addSubtitlesToTimeline] response:', data);
+  return data;
 }
 
 export async function closeResolveLink() {

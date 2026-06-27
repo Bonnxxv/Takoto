@@ -1,10 +1,10 @@
 import * as React from "react"
-import { Layers2, Users, X, Loader2 } from "lucide-react"
+import { Layers2, Users, X, Loader2, FileUp } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { SubtitleList } from "@/components/subtitle-list"
 import { useGlobal } from "@/contexts/GlobalContext"
-import { ImportExportPopover } from "@/components/import-export-popover"
+import { ShareDialog } from "@/components/import-export-popover"
 import { SpeakerEditor } from "@/components/speaker-editor"
 
 interface MobileSubtitleViewerProps {
@@ -57,14 +57,16 @@ export function MobileSubtitleViewer({ isOpen, onClose }: MobileSubtitleViewerPr
       {/* Search & Import/Export & Speakers */}
       <div className="p-2 border-b shrink-0 sticky top-0 bg-sidebar space-y-1.5">
         <div className="flex space-x-2 items-center">
-          <ImportExportPopover
-            onImport={importSubtitles}
+          <Button variant="outline" size="icon" onClick={importSubtitles} title="Impor subtitle">
+            <FileUp className="w-4 h-4" />
+          </Button>
+          <ShareDialog
             onExport={exportSubtitlesAs}
             hasSubtitles={subtitles.length > 0}
           />
-          <Button variant="outline" className="w-full" onClick={() => setShowSpeakerEditor(true)}>
+          <Button variant="outline" className="flex-1" onClick={() => setShowSpeakerEditor(true)}>
             <Users className="w-4 h-4 mr-2" />
-            Edit Pembicara
+            Speakers
           </Button>
           <SpeakerEditor afterTranscription={false} open={showSpeakerEditor} onOpenChange={setShowSpeakerEditor} />
         </div>

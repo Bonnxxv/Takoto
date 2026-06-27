@@ -1,4 +1,4 @@
-import { AArrowUp, Signature, ShieldX, WholeWord, CircleX, Settings, CircleFadingArrowUp, History, Type, CaseLower, CaseUpper, CaseSensitive } from "lucide-react"
+import { AArrowUp, ShieldX, WholeWord, CircleX, Settings, CircleFadingArrowUp, History, Type, CaseLower, CaseUpper, CaseSensitive } from "lucide-react"
 import type { LucideIcon } from "lucide-react"
 
 const textCaseConfig: Record<string, { icon: LucideIcon; label: string }> = {
@@ -95,34 +95,41 @@ export const TextFormattingCard = ({
         <DialogHeader>
           <DialogTitle className="text-sm font-semibold">Aturan Baris</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
+        <div className="divide-y divide-border">
+          <div className="flex items-center justify-between py-4">
             <div>
               <p className="text-sm font-medium">Batas Karakter</p>
               {maxCharsPerLine === 0 ? <p className="text-xs text-orange-500 flex items-center gap-1"><CircleX className="w-3 h-3" /> Nonaktif</p> : <p className="text-xs text-muted-foreground">Per baris (0 = tanpa batas)</p>}
             </div>
             <Input type="number" min="0" value={maxCharsPerLine} onChange={(e) => onMaxCharsPerLineChange(Number(e.target.value))} className="w-20" />
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-4">
             <div>
               <p className="text-sm font-medium">Batas Kata</p>
               {maxWordsPerLine === 0 ? <p className="text-xs text-orange-500 flex items-center gap-1"><CircleX className="w-3 h-3" /> Nonaktif</p> : <p className="text-xs text-muted-foreground">Per baris (0 = tanpa batas)</p>}
             </div>
             <Input type="number" min="0" value={maxWordsPerLine} onChange={(e) => onMaxWordsPerLineChange(Number(e.target.value))} className="w-20" />
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-4">
             <div>
               <p className="text-sm font-medium">Jumlah Baris</p>
               <p className="text-xs text-muted-foreground">Baris maksimal per subtitle</p>
             </div>
             <Input type="number" min="1" value={maxLinesPerSubtitle} onChange={(e) => onMaxLinesPerSubtitleChange(Number(e.target.value))} className="w-20" />
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between py-4">
             <div>
               <p className="text-sm font-medium">Pisahkan pada Tanda Baca</p>
               <p className="text-xs text-muted-foreground">Pemisahan baris alami</p>
             </div>
             <Switch checked={splitOnPunctuation} onCheckedChange={onSplitOnPunctuationChange} />
+          </div>
+          <div className="flex items-center justify-between py-4">
+            <div>
+              <p className="text-sm font-medium">Hapus Tanda Baca</p>
+              <p className="text-xs text-muted-foreground">Hapus koma, titik, dll.</p>
+            </div>
+            <Switch checked={removePunctuation} onCheckedChange={onRemovePunctuationChange} />
           </div>
         </div>
       </DialogContent>
@@ -157,12 +164,6 @@ export const TextFormattingCard = ({
               ))}
             </SelectContent>
           </Select>
-        </div>
-        {/* Hapus Tanda Baca */}
-        <div className="bg-card flex items-center gap-3 px-3.5 py-3 border-t border-border">
-          <Signature className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="text-sm flex-1">Hapus Tanda Baca</span>
-          <Switch checked={removePunctuation} onCheckedChange={onRemovePunctuationChange} />
         </div>
         {/* Sensor */}
         <div className="bg-card border-t border-border">
@@ -325,6 +326,17 @@ export const TextFormattingCard = ({
                       onCheckedChange={onSplitOnPunctuationChange}
                     />
                   </div>
+                  {/* Hapus Tanda Baca */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">Hapus Tanda Baca</p>
+                      <p className="text-xs text-muted-foreground">Hapus koma, titik, dll.</p>
+                    </div>
+                    <Switch
+                      checked={removePunctuation}
+                      onCheckedChange={onRemovePunctuationChange}
+                    />
+                  </div>
                 </div>
               </PopoverContent>
             </Popover>
@@ -361,23 +373,6 @@ export const TextFormattingCard = ({
               </Select>
             </div>
           </div>
-      </Card>
-
-      {/* Remove Punctuation */}
-      <Card className="flex items-center justify-between p-3.5 shadow-none relative">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
-            <Signature className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-          </div>
-          <div>
-            <p className="text-sm font-medium">Hapus Tanda Baca</p>
-            <p className="text-xs text-muted-foreground">Menghapus semua koma, titik, dll.</p>
-          </div>
-        </div>
-        <Switch
-          checked={removePunctuation}
-          onCheckedChange={onRemovePunctuationChange}
-        />
       </Card>
 
       {/* Censored Words */}

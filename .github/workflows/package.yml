@@ -102,6 +102,11 @@ jobs:
         rm -f "$ZIP_NAME"
 
     - name: Build Tauri
+      env:
+        VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+        VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+        VITE_GOOGLE_SERVICE_ACCOUNT: ${{ secrets.VITE_GOOGLE_SERVICE_ACCOUNT }}
+        VITE_GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.VITE_GOOGLE_DRIVE_FOLDER_ID }}
       run: |
         cd Takoto-App
         export APPLE_SIGNING_IDENTITY="Developer ID Application: ${{ secrets.APPLE_IDENTITY }}"
@@ -242,6 +247,10 @@ jobs:
         TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
         TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         CARGO_TARGET_DIR: D:\target
+        VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+        VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+        VITE_GOOGLE_SERVICE_ACCOUNT: ${{ secrets.VITE_GOOGLE_SERVICE_ACCOUNT }}
+        VITE_GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.VITE_GOOGLE_DRIVE_FOLDER_ID }}
       run: |
         cd Takoto-App
         npm run tauri build -- -- --no-default-features --features windows
@@ -327,6 +336,10 @@ jobs:
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+          VITE_GOOGLE_SERVICE_ACCOUNT: ${{ secrets.VITE_GOOGLE_SERVICE_ACCOUNT }}
+          VITE_GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.VITE_GOOGLE_DRIVE_FOLDER_ID }}
         run: |
           cd Takoto-App
           npm run tauri build -- -- --no-default-features --features linux

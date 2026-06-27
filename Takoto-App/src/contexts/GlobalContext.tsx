@@ -718,8 +718,22 @@ export function GlobalProvider({ children }: GlobalProviderProps) {
   };
 
   async function pushToTimeline() {
-    let filename = generateTranscriptFilename(settings.isStandaloneMode, fileInput, timelineInfo.timelineId);
-    await addSubtitlesToTimeline(filename, settings.selectedTemplate.value, settings.selectedOutputTrack);
+    try {
+      let filename = generateTranscriptFilename(settings.isStandaloneMode, fileInput, timelineInfo.timelineId);
+      console.log('[pushToTimeline] filename:', filename, '| template:', settings.selectedTemplate.value, '| track:', settings.selectedOutputTrack);
+      const result = await addSubtitlesToTimeline(filename, settings.selectedTemplate.value, settings.selectedOutputTrack);
+      console.log('[pushToTimeline] result:', result);
+      if (result?.error) {
+        toast.error('Gagal menambahkan ke timeline', { description: result.message || String(result.error) });
+        throw new Error(result.message || String(result.error));
+      } else {
+        toast.success('Subtitle berhasil ditambahkan ke timeline');
+      }
+    } catch (error) {
+      console.error('[pushToTimeline] error:', error);
+      toast.error('Gagal menambahkan ke timeline', { description: String(error) });
+      throw error;
+    }
   }
 
   // 👇 TAMBAHAN: Implementasi fungsi pembersih

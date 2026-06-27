@@ -1,11 +1,8 @@
 import * as React from "react"
-import { Download, FileUp, FileJson, Captions, Speech, Share2, CheckCircle2, Loader2, ChevronRight } from "lucide-react"
+import { Download, FileJson, Captions, Speech, Share2, CheckCircle2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { open } from '@tauri-apps/plugin-dialog'
-import { downloadDir } from "@tauri-apps/api/path"
-import { getCurrentWebview } from "@tauri-apps/api/webview"
 import { Switch } from "@/components/ui/switch"
 import { Card } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -16,16 +13,13 @@ import { toast } from "sonner"
 
 type ExportFormat = 'srt' | 'json';
 
-interface ImportExportPopoverProps {
-    onImport: () => Promise<void>
+interface ShareDialogProps {
     onExport: (format: ExportFormat, includeSpeakerLabels: boolean) => Promise<void>
     hasSubtitles: boolean
-    compact?: boolean
 }
 
-export function ImportExportPopover({ onImport, onExport, hasSubtitles, compact = false }: ImportExportPopoverProps) {
+export function ShareDialog({ onExport, hasSubtitles }: ShareDialogProps) {
     const [isOpen, setIsOpen] = React.useState(false)
-    const [selectedFile, setSelectedFile] = React.useState<string | null>(null)
     const [exportFormat, setExportFormat] = React.useState<ExportFormat>('srt')
     const [includeSpeakerLabels, setIncludeSpeakerLabels] = React.useState(false)
     const [shareProgress, setShareProgress] = React.useState<string | null>(null)
@@ -34,44 +28,6 @@ export function ImportExportPopover({ onImport, onExport, hasSubtitles, compact 
     const { subtitles, speakers, settings, fileInput, timelineInfo } = useGlobal()
     const { editorProfile, updateProfile } = useGoogleAuth()
     const driveConfigured = isDriveConfigured()
-
-    React.useEffect(() => {
-        let unlisten: (() => void) | undefined;
-        (async () => {
-            const webview = await getCurrentWebview();
-            unlisten = await webview.onDragDropEvent((event: any) => {
-                if (event.payload.type === 'drop') {
-                    const files = event.payload.paths as string[] | undefined;
-                    if (files && files.length > 0) {
-                        const file = files[0];
-                        if (file.endsWith('.srt')) setSelectedFile(file);
-                    }
-                }
-            });
-        })();
-        return () => { if (unlisten) unlisten(); };
-    }, []);
-
-    const handleFileSelect = async () => {
-        const file = await open({
-            multiple: false,
-            directory: false,
-            filters: [{ name: 'Subtitle Files', extensions: ['srt'] }],
-            defaultPath: await downloadDir()
-        });
-        if (file) setSelectedFile(file as string);
-    };
-
-    const handleImportFile = async () => {
-        if (selectedFile) {
-            try { 
-                await onImport(); 
-                setIsOpen(false);
-            } catch (error) { 
-                console.error("Failed to import file:", error); 
-            }
-        }
-    };
 
     const handleExportFile = async () => {
         try { 
@@ -117,55 +73,22 @@ export function ImportExportPopover({ onImport, onExport, hasSubtitles, compact 
     return (
         <Dialog open={isOpen} onOpenChange={(val) => { setIsOpen(val); setShareProgress(null); setShareSuccess(false); }}>
             <DialogTrigger asChild>
-                {compact ? (
-                    <button className="bg-card w-full flex items-center gap-3 px-3.5 py-3 text-left hover:bg-muted/50 transition-colors">
-                        <Share2 className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                        <span className="text-sm flex-1">Impor / Ekspor</span>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    </button>
-                ) : (
-                    <Button variant="outline" className="w-full flex items-center justify-center gap-2">
-                        <Share2 className="h-4 w-4" />
-                        Share
-                    </Button>
-                )}
+                <Button variant="outline" size="icon" title="Ekspor & Bagikan">
+                    <Share2 className="h-4 w-4" />
+                </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-md p-5">
                 <DialogHeader className="mb-2">
-                    <DialogTitle>Impor / Ekspor / Bagikan Subtitle</DialogTitle>
+                    <DialogTitle>Ekspor & Bagikan</DialogTitle>
                     <DialogDescription className="text-xs text-muted-foreground">
-                        Pilih opsi di bawah untuk mengimpor file subtitle baru, mengekspor subtitle yang ada, atau membagikannya ke Google Drive.
+                        Download subtitle sebagai file, atau bagikan langsung ke Google Drive.
                     </DialogDescription>
                 </DialogHeader>
-                <Tabs defaultValue="import" className="w-full">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="import">Impor</TabsTrigger>
+                <Tabs defaultValue="export" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="export">Ekspor</TabsTrigger>
                         <TabsTrigger value="share">Bagikan</TabsTrigger>
                     </TabsList>
-
-                    {/* Tab Impor */}
-                    <TabsContent value="import" className="space-y-3">
-                        <div
-                            className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/50 transition-colors mt-3 flex flex-col items-center justify-center h-36"
-                            onClick={handleFileSelect}
-                        >
-                            <FileUp className="h-8 w-8 mb-2 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Tarik file di sini atau klik untuk memilih</span>
-                            <span className="text-xs text-muted-foreground mt-1">Mendukung file <span className="font-mono">.srt</span></span>
-                        </div>
-                        {selectedFile && (
-                            <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-muted/40 rounded-lg">
-                                <span className="text-sm text-muted-foreground">Dipilih:</span>
-                                <span className="font-mono text-xs bg-background px-2 py-0.5 rounded border border-muted-foreground/10 max-w-[220px] truncate">
-                                    {selectedFile.split('/').pop()}
-                                </span>
-                            </div>
-                        )}
-                        <Button onClick={handleImportFile} className="w-full mt-2" disabled={!selectedFile}>
-                            Impor File
-                        </Button>
-                    </TabsContent>
 
                     {/* Tab Ekspor */}
                     <TabsContent value="export" className="space-y-3">
