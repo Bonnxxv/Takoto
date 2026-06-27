@@ -2,7 +2,7 @@
 name = "takoto"
 version = "3.5.0"
 description = "Transcribe and diarize audio files"
-authors = ["Tom Moroney"]
+authors = ["Bona Tua", "Tsabit", "Yosia Gabriel"]
 edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

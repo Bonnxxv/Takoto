@@ -117,7 +117,7 @@ jobs:
       run: |
         chmod +x Mac-Package/Scripts/*
         VERSION="${TAG#v}"
-        pkgbuild --identifier com.tom-moroney.takoto \
+        pkgbuild --identifier com.takoto \
           --version "$VERSION" \
           --install-location "/Applications" \
           --root Mac-Package/Payload \
