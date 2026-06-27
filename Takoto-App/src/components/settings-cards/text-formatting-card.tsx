@@ -1,11 +1,20 @@
-import { AArrowUp, Signature, ShieldX, WholeWord, CircleX, Settings, CircleFadingArrowUp, History } from "lucide-react"
+import { AArrowUp, Signature, ShieldX, WholeWord, CircleX, Settings, CircleFadingArrowUp, History, Type, CaseLower, CaseUpper, CaseSensitive } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
+
+const textCaseConfig: Record<string, { icon: LucideIcon; label: string }> = {
+  none:      { icon: Type,          label: "Normal" },
+  lowercase: { icon: CaseLower,     label: "Kecil" },
+  uppercase: { icon: CaseUpper,     label: "Besar" },
+  titlecase: { icon: CaseSensitive, label: "Judul" },
+}
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -76,13 +85,16 @@ export const TextFormattingCard = ({
   ].filter(Boolean).join(' • ')
 
   const formatPopover = (
-    <Popover>
-      <PopoverTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="h-8 w-8 flex-shrink-0">
           <Settings className="w-4 h-4" />
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-80 p-4" align="end">
+      </DialogTrigger>
+      <DialogContent className="w-[320px] p-5" onOpenAutoFocus={e => e.preventDefault()}>
+        <DialogHeader>
+          <DialogTitle className="text-sm font-semibold">Aturan Baris</DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -113,8 +125,8 @@ export const TextFormattingCard = ({
             <Switch checked={splitOnPunctuation} onCheckedChange={onSplitOnPunctuationChange} />
           </div>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   )
 
   if (compact) {
@@ -129,19 +141,20 @@ export const TextFormattingCard = ({
           </div>
           {formatPopover}
         </div>
-        {/* Kasus Teks */}
+        {/* Format Teks */}
         <div className="bg-card flex items-center gap-3 px-3.5 py-3 border-t border-border">
           <AArrowUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="text-sm flex-1">Kasus Teks</span>
+          <span className="text-sm flex-1">Format Teks</span>
           <Select value={textCase} onValueChange={(val) => onTextCaseChange(val as "none" | "uppercase" | "lowercase" | "titlecase")}>
-            <SelectTrigger className="w-[120px] h-8 text-xs">
-              <SelectValue />
+            <SelectTrigger className="w-[100px] h-8 text-xs">
+              {(() => { const cfg = textCaseConfig[textCase] ?? textCaseConfig.none; const Icon = cfg.icon; return <div className="flex items-center gap-1.5"><Icon className="h-3.5 w-3.5" /><span>{cfg.label}</span></div> })()}
             </SelectTrigger>
             <SelectContent align="end">
-              <SelectItem value="none">Normal</SelectItem>
-              <SelectItem value="lowercase">huruf kecil</SelectItem>
-              <SelectItem value="uppercase">HURUF BESAR</SelectItem>
-              <SelectItem value="titlecase">Kasus Judul</SelectItem>
+              {Object.entries(textCaseConfig).map(([val, { icon: Icon, label }]) => (
+                <SelectItem key={val} value={val}>
+                  <div className="flex items-center gap-2"><Icon className="h-4 w-4" /><span>{label}</span></div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -326,7 +339,7 @@ export const TextFormattingCard = ({
                 <AArrowUp className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
               </div>
               <div>
-                <p className="text-sm font-medium">Kasus Teks</p>
+                <p className="text-sm font-medium">Format Teks</p>
                 <p className="text-xs text-muted-foreground">Ubah kasus subtitle</p>
               </div>
             </div>
@@ -336,13 +349,14 @@ export const TextFormattingCard = ({
                 onValueChange={(val) => onTextCaseChange(val as "none" | "uppercase" | "lowercase" | "titlecase")}
               >
                 <SelectTrigger className="">
-                  <SelectValue placeholder="Pilih kasus teks" />
+                  {(() => { const cfg = textCaseConfig[textCase] ?? textCaseConfig.none; const Icon = cfg.icon; return <div className="flex items-center gap-1.5"><Icon className="h-3.5 w-3.5" /><span>{cfg.label}</span></div> })()}
                 </SelectTrigger>
                 <SelectContent align="end">
-                  <SelectItem value="none">Normal</SelectItem>
-                  <SelectItem value="lowercase">huruf kecil</SelectItem>
-                  <SelectItem value="uppercase">HURUF BESAR</SelectItem>
-                  <SelectItem value="titlecase">Kasus Judul</SelectItem>
+                  {Object.entries(textCaseConfig).map(([val, { icon: Icon, label }]) => (
+                    <SelectItem key={val} value={val}>
+                      <div className="flex items-center gap-2"><Icon className="h-4 w-4" /><span>{label}</span></div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

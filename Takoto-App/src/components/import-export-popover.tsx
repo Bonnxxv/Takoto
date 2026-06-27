@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Download, Upload, FileUp, FileJson, Captions, Speech, Share2, CheckCircle2, Loader2, ChevronRight } from "lucide-react"
+import { Download, FileUp, FileJson, Captions, Speech, Share2, CheckCircle2, Loader2, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
@@ -125,8 +125,8 @@ export function ImportExportPopover({ onImport, onExport, hasSubtitles, compact 
                     </button>
                 ) : (
                     <Button variant="outline" className="w-full flex items-center justify-center gap-2">
-                        <Upload className="h-4 w-4" />
-                        Impor / Ekspor
+                        <Share2 className="h-4 w-4" />
+                        Share
                     </Button>
                 )}
             </DialogTrigger>

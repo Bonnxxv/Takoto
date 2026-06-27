@@ -5,12 +5,10 @@ import {
     LoaderCircle,
     CirclePlay,
     XCircle,
-    Zap,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-import { Switch } from "@/components/ui/switch"
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,11 +29,9 @@ import { AudioInputCard } from "./settings-cards/audio-input-card"
 import { SubtitleSettingsCard } from "./settings-cards/subtitle-settings-card"
 import { LanguageSettingsCard } from "@/components/settings-cards/language-settings-card"
 import { ModelSelectionCard } from "./settings-cards/model-selection-card"
-import { SpeakerLabelingCard } from "./settings-cards/speaker-labeling-card"
 import { TextFormattingCard } from "./settings-cards/text-formatting-card"
 import { SpeakerEditor } from "./speaker-editor"
 import { TranscriptionOptions } from "@/types/interfaces"
-import { WordTimestampsCard } from "./settings-cards/word-timestamps-card"
 
 interface TranscriptionSettingsProps {}
 
@@ -259,13 +255,6 @@ export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
                             onSourceLanguageChange={(language) => updateSetting('language', language)}
                             onTranslateChange={(translate) => updateSetting('translate', translate)}
                         />
-                        <SpeakerLabelingCard
-                            compact
-                            diarize={settings.enableDiarize}
-                            maxSpeakers={settings.maxSpeakers}
-                            onDiarizeChange={(checked) => updateSetting("enableDiarize", checked)}
-                            onMaxSpeakersChange={(value) => updateSetting("maxSpeakers", value)}
-                        />
                         <ModelSelectionCard
                             compact
                             language={settings.language}
@@ -276,20 +265,6 @@ export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
                             onModelChange={(model) => updateSetting('model', model)}
                             onDeleteModel={(model) => handleDeleteModel(model)}
                         />
-                    </div>
-
-                    {/* Eksperimental */}
-                    <div className="rounded-xl border border-border overflow-hidden divide-y divide-border">
-                        <WordTimestampsCard
-                            compact
-                            enableDTW={settings.enableDTW}
-                            onEnableDTWChange={(checked) => updateSetting("enableDTW", checked)}
-                        />
-                        <div className="bg-card flex items-center gap-3 px-3.5 py-3">
-                            <Zap className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                            <span className="text-sm flex-1">Akselerasi GPU</span>
-                            <Switch checked={settings.enableGpu} onCheckedChange={(checked) => updateSetting("enableGpu", checked)} />
-                        </div>
                     </div>
 
                     {/* Format Teks */}

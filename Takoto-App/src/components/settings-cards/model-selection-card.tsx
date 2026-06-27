@@ -70,7 +70,7 @@ export const ModelSelectionCard = ({
       <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="all">Semua Bahasa</TabsTrigger>
-          <TabsTrigger value="en">Hanya Bahasa Inggris</TabsTrigger>
+          <TabsTrigger value="en">Bahasa Inggris</TabsTrigger>
         </TabsList>
         <ScrollArea className="h-[200px] mt-1">
           <div className="space-y-1 pr-0">

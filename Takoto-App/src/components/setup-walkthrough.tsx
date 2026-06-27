@@ -64,10 +64,10 @@ export const SetupWalkthrough = ({
                 >
                   <TabsList className="w-full bg-muted">
                     <TabsTrigger value="resolve" className="flex-1 text-sm">
-                      Resolve
+                      Timeline
                     </TabsTrigger>
                     <TabsTrigger value="standalone" className="flex-1 text-sm">
-                      Standalone
+                      File
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>

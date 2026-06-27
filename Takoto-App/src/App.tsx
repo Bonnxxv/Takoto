@@ -110,8 +110,8 @@ function MainApp() {
               className="w-full max-w-[400px]"
             >
               <TabsList className="w-full rounded-full bg-secondary">
-                <TabsTrigger value="resolve" className="flex-1 rounded-full text-sm">Resolve</TabsTrigger>
-                <TabsTrigger value="standalone" className="flex-1 rounded-full text-sm">Standalone</TabsTrigger>
+                <TabsTrigger value="resolve" className="flex-1 rounded-full text-sm">Timeline</TabsTrigger>
+                <TabsTrigger value="standalone" className="flex-1 rounded-full text-sm">File</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -142,8 +142,8 @@ function MainApp() {
                       className="w-full max-w-[400px]"
                     >
                       <TabsList className="w-full bg-secondary">
-                        <TabsTrigger value="resolve" className="flex-1 text-sm">Resolve</TabsTrigger>
-                        <TabsTrigger value="standalone" className="flex-1 text-sm">Standalone</TabsTrigger>
+                        <TabsTrigger value="resolve" className="flex-1 text-sm">Timeline</TabsTrigger>
+                        <TabsTrigger value="standalone" className="flex-1 text-sm">File</TabsTrigger>
                       </TabsList>
                     </Tabs>
                   </div>

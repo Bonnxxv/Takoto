@@ -70,7 +70,7 @@ export const SubtitleSettingsCard = ({
       <div>
         <div className="bg-card flex items-center gap-3 px-3.5 py-3">
           <MonitorPlay className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <span className="text-sm flex-1">Trek Keluaran</span>
+          <span className="text-sm flex-1">Output Track</span>
           <Select value={selectedOutputTrack} onValueChange={onOutputTrackChange}>
             <SelectTrigger className="w-[140px] h-8 text-xs">
               <SelectValue />
@@ -108,7 +108,7 @@ export const SubtitleSettingsCard = ({
 
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-sm font-normal">Trek Keluaran</Label>
+            <Label className="text-sm font-normal">Output Track</Label>
             <Select value={selectedOutputTrack} onValueChange={onOutputTrackChange}>
               <SelectTrigger className="w-[180px] h-9">
                 <SelectValue />

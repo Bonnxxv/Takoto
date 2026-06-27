@@ -146,9 +146,9 @@ export function SpeakerEditor({ afterTranscription = false, open = false, onOpen
                                                 />
                                             </div>
 
-                                            {/* Trek Keluaran */}
+                                            {/* Output Track */}
                                             <div className="space-y-2">
-                                                <Label>Trek Keluaran</Label>
+                                                <Label>Output Track</Label>
                                                 <Select
                                                     value={speaker.track || settings.selectedOutputTrack}
                                                     onValueChange={(value) => updateSpeaker(index, { ...speaker, track: value })}

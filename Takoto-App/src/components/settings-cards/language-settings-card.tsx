@@ -172,21 +172,6 @@ export const LanguageSettingsCard = ({
             {languagePopoverContent(sourceLanguage, onSourceLanguageChange, setOpenSourceLanguages)}
           </Popover>
         </div>
-        {sourceLanguage !== 'en' && (
-          <div className="flex items-center gap-3 px-3.5 py-3 border-t border-border">
-            <Languages className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <span className="text-sm flex-1">Terjemahkan ke Inggris</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Info className="h-3.5 w-3.5 text-muted-foreground cursor-pointer mr-1" />
-              </TooltipTrigger>
-              <TooltipContent side="bottom" className="w-64 p-3">
-                <p className="text-xs">Model Whisper hanya mendukung terjemahan ke bahasa Inggris.</p>
-              </TooltipContent>
-            </Tooltip>
-            <Switch checked={translate} onCheckedChange={onTranslateChange} />
-          </div>
-        )}
       </div>
     )
   }
