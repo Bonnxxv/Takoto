@@ -3,6 +3,7 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Card } from "@/components/ui/card"
 
 interface SpeakerLabelingCardProps {
   diarize: boolean
@@ -18,8 +19,7 @@ export const SpeakerLabelingCard = ({
   onMaxSpeakersChange,
 }: SpeakerLabelingCardProps) => {
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="p-3.5">
+    <Card className="p-3.5 shadow-none relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
@@ -95,7 +95,6 @@ export const SpeakerLabelingCard = ({
             )}
           </div>
         )}
-      </div>
-    </div>
+    </Card>
   )
 }

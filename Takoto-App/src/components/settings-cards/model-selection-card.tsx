@@ -7,6 +7,7 @@ import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Model } from "@/types/interfaces"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card } from "@/components/ui/card"
 
 interface ModelSelectionCardProps {
   language: string
@@ -36,9 +37,8 @@ export const ModelSelectionCard = ({
   }, [language])
 
   return (
-    <div className="border rounded-lg overflow-hidden dark:from-gray-900 dark:to-purple-950/20">
-      <div className="p-4">
-        <div className="flex items-center justify-between mb-4">
+    <Card className="p-3.5 shadow-none relative dark:from-gray-900 dark:to-purple-950/20">
+      <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
               <Brain className="h-5 w-5 text-purple-600 dark:text-purple-400" />
@@ -132,7 +132,7 @@ export const ModelSelectionCard = ({
               <ChevronsUpDown className="mx-1 h-5 w-5 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[300px] p-2" align="start">
+          <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[300px] p-2" align="start">
             <Tabs defaultValue="all" className="w-full" value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="all">Semua Bahasa</TabsTrigger>
@@ -204,7 +204,6 @@ export const ModelSelectionCard = ({
         <div className="mt-3 p-3 bg-purple-50/50 dark:bg-purple-950/20 rounded-lg border border-purple-100 dark:border-purple-900/30">
           <p className="text-xs text-gray-700 dark:text-gray-300 leading-relaxed">{models[selectedModel].details}</p>
         </div>
-      </div>
-    </div>
+    </Card>
   )
 }

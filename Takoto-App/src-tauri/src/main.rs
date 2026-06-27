@@ -25,6 +25,7 @@ mod models;
 mod transcribe;
 mod transcript;
 mod logging;
+mod oauth;
 
 // Include integration-like tests that need crate visibility
 #[cfg(test)]
@@ -168,7 +169,9 @@ fn main() {
             models::delete_model,
             logging::get_backend_logs,
             logging::clear_backend_logs,
-            logging::get_log_dir
+            logging::get_log_dir,
+            oauth::oauth_start_server,
+            oauth::exchange_service_account_token
         ])
         .build(tauri::generate_context!())
         .expect("error while building Tauri application")

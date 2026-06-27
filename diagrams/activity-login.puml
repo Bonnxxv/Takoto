@@ -1,0 +1,127 @@
+@startuml Activity Diagram — Login & Autentikasi
+
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 11
+skinparam backgroundColor white
+skinparam roundcorner 10
+skinparam shadowing false
+
+skinparam activity {
+    BackgroundColor #EFF6FF
+    BorderColor #2563EB
+    FontColor #1a1a1a
+    ArrowColor #374151
+    ArrowFontColor #374151
+    DiamondBackgroundColor #FEF9C3
+    DiamondBorderColor #D97706
+    DiamondFontColor #78350F
+    StartColor #1E3A5F
+    EndColor #1E3A5F
+    BarColor #2563EB
+}
+
+skinparam swimlane {
+    BorderColor #CBD5E1
+    TitleBackgroundColor #1E3A5F
+    TitleFontColor white
+    TitleFontStyle bold
+}
+
+skinparam note {
+    BackgroundColor #FFFBEB
+    BorderColor #D97706
+    FontColor #92400E
+    FontSize 9
+}
+
+title Activity Diagram — Login & Autentikasi Editor\n
+
+|#EFF6FF|Editor|
+|#F0FDF4|Aplikasi Takoto|
+|#FEF2F2|Google OAuth|
+
+|Editor|
+start
+:Buka Aplikasi Takoto;
+
+|Aplikasi Takoto|
+:Cek file takoto-store.json;
+
+if (Profil tersimpan\ndi store?) then (Ya)
+    :Muat profil editor\n(nama, email, foto, token);
+    if (Token masih\nvalid?) then (Ya)
+        :Tampilkan antarmuka\nutama aplikasi;
+        stop
+    else (Tidak / Expired)
+        :Coba refresh token\ndengan refresh_token;
+        |Google OAuth|
+        :Proses refresh token;
+        if (Refresh berhasil?) then (Ya)
+            |Aplikasi Takoto|
+            :Simpan access_token\nbaru ke store;
+            :Tampilkan antarmuka\nutama aplikasi;
+            stop
+        else (Gagal / Revoked)
+            |Aplikasi Takoto|
+            :Hapus profil dari store;
+        endif
+    endif
+else (Tidak)
+endif
+
+:Tampilkan halaman Login;
+
+|Editor|
+:Klik "Masuk dengan\nGoogle";
+
+|Aplikasi Takoto|
+:Generate PKCE\n(code_verifier + code_challenge);
+:Generate state random;
+:Invoke oauth_start_server\n→ TCP server pada port acak;
+:Buka browser ke URL\nGoogle OAuth consent;
+
+|Google OAuth|
+:Tampilkan form\nlogin Google;
+
+|Editor|
+:Masukkan email &\npassword Google;
+
+|Google OAuth|
+:Validasi kredensial;
+
+if (Login valid &\nada di test users?) then (Ya)
+    :Tampilkan consent screen\n(Drive access request);
+    |Editor|
+    :Klik "Allow" / Izinkan;
+    |Google OAuth|
+    :Redirect ke\nlocalhost:{port}/callback?code=...;
+else (Tidak)
+    |Google OAuth|
+    :Tampilkan pesan error;
+    |Editor|
+    :Lihat error "Access blocked"\natau kredensial salah;
+    |Aplikasi Takoto|
+    :Tampilkan pesan error\ndi login screen;
+    stop
+endif
+
+|Aplikasi Takoto|
+:TCP server terima callback;
+:Kirim respons HTML\n"Login Berhasil";
+:Emit event "oauth-callback"\ndengan URL lengkap;
+:Extract authorization code\ndan validasi state;
+
+|Google OAuth|
+:POST /token dengan code\n+ code_verifier + client_secret;
+:Return access_token,\nrefresh_token, expires_in;
+
+|Aplikasi Takoto|
+:GET /userinfo dengan access_token;
+:Terima email, name, picture, sub;
+:Simpan EditorProfile ke store\n(termasuk token & expiry);
+:Tampilkan antarmuka\nutama aplikasi;
+:Tampilkan foto & nama editor\ndi header (avatar);
+
+stop
+
+@enduml

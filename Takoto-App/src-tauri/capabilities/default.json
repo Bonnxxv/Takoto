@@ -30,6 +30,15 @@
         },
         {
           "url": "https://github.com/thewh1teagle/pyannote-rs/releases/*"
+        },
+        {
+          "url": "https://oauth2.googleapis.com/*"
+        },
+        {
+          "url": "https://www.googleapis.com/*"
+        },
+        {
+          "url": "https://accounts.google.com/*"
         }
       ],
       "deny": [
@@ -91,12 +100,36 @@
     "shell:default",
     "os:default",
     {
+      "identifier": "opener:allow-open-url",
+      "allow": [
+        { "url": "https://**" },
+        { "url": "http://**" }
+      ]
+    },
+    {
       "identifier": "opener:allow-open-path",
       "allow": [
         { "path": "$APPLOG/**" },
         { "path": "$APPDATA/**" },
         { "path": "$APPCACHE/**" },
-        { "path": "$APPLOCALDATA/**" }
+        { "path": "$APPLOCALDATA/**" },
+        { "path": "$DOWNLOAD/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$DESKTOP/**" },
+        { "path": "$HOME/**" }
+      ]
+    },
+    {
+      "identifier": "opener:allow-reveal-item-in-dir",
+      "allow": [
+        { "path": "$APPLOG/**" },
+        { "path": "$APPDATA/**" },
+        { "path": "$APPCACHE/**" },
+        { "path": "$APPLOCALDATA/**" },
+        { "path": "$DOWNLOAD/**" },
+        { "path": "$DOCUMENT/**" },
+        { "path": "$DESKTOP/**" },
+        { "path": "$HOME/**" }
       ]
     }
   ]

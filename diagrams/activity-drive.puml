@@ -1,0 +1,154 @@
+@startuml Activity Diagram — Bagikan ke Google Drive
+
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 11
+skinparam backgroundColor white
+skinparam roundcorner 10
+skinparam shadowing false
+
+skinparam activity {
+    BackgroundColor #EFF6FF
+    BorderColor #2563EB
+    FontColor #1a1a1a
+    ArrowColor #374151
+    DiamondBackgroundColor #FEF9C3
+    DiamondBorderColor #D97706
+    DiamondFontColor #78350F
+    StartColor #1E3A5F
+    EndColor #1E3A5F
+    BarColor #2563EB
+}
+
+skinparam swimlane {
+    BorderColor #CBD5E1
+    TitleBackgroundColor #1E3A5F
+    TitleFontColor white
+    TitleFontStyle bold
+}
+
+skinparam note {
+    BackgroundColor #FFFBEB
+    BorderColor #D97706
+    FontColor #92400E
+    FontSize 9
+}
+
+title Activity Diagram — Bagikan Transkripsi ke Google Drive\n
+
+|#EFF6FF|Editor|
+|#F0FDF4|Frontend (React)|
+|#FEF2F2|Google Drive API|
+|#F5F3FF|Google OAuth API|
+
+|Editor|
+start
+:Buka tab "Bagikan"\ndi popover Impor/Ekspor;
+
+|Frontend (React)|
+:Tampilkan info editor\n(avatar, nama, email);
+:Tampilkan path folder target:\n"transkripsi_{email_slug}";
+
+|Editor|
+:Pilih: sertakan label\npembicara atau tidak;
+:Klik "Bagikan ke Google Drive";
+
+|Frontend (React)|
+:Panggil shareToGoogleDrive();
+:Progress: "Memverifikasi akses Drive...";
+
+' === TOKEN VALIDATION ===
+:getValidToken(editorProfile);
+if (access_token masih\nvalid? (expiry > now+60s)) then (Ya)
+    :Gunakan access_token\nyang tersimpan;
+else (Token expired)
+    :Progress: "Memperbarui token...";
+    |Google OAuth API|
+    :POST /token\ngrant_type=refresh_token;
+    if (Refresh berhasil?) then (Ya)
+        :Return access_token baru\n+ expires_in;
+        |Frontend (React)|
+        :Update token di store\n(updateProfile);
+    else (Gagal / Token dicabut)
+        |Frontend (React)|
+        :Tampilkan error:\n"Token kadaluarsa.\nSilakan login ulang.";
+        stop
+    endif
+endif
+
+' === FOLDER STRUCTURE ===
+:Progress: "Menyiapkan folder editor...";
+:Bentuk editor_slug dari\nemail (prefix sebelum @);
+
+|Google Drive API|
+:GET /files?q=name='transkripsi_{slug}'\n&parents in [mainFolderId];
+if (Folder editor\nsudah ada?) then (Ya)
+    :Return folder ID;
+else (Tidak)
+    :POST /files\nBuat folder "transkripsi_{slug}";
+    :Return folder ID baru;
+endif
+
+|Frontend (React)|
+:Progress: "Menyiapkan folder tanggal...";
+
+|Google Drive API|
+:Cek / Buat folder bulan\n"YYYY-MM";
+:Cek / Buat folder tanggal\n"DD";
+
+note right
+  Contoh struktur:
+  transkripsi_19221559/
+  └ 2026-06/
+    └ 24/
+end note
+
+' === GENERATE FILES ===
+|Frontend (React)|
+:Generate konten SRT\ndari subtitles + speakers;
+:Generate konten TXT\n(plain text tanpa timecode);
+:Bentuk nama file:\n"{judul_audio}_{YYYY-MM-DD}";
+
+' === UPLOAD FILES ===
+:Progress: "Mengupload file SRT...";
+
+|Google Drive API|
+:POST /upload/drive/v3/files\n?uploadType=multipart;
+:Upload "{filename}.srt"\nke dayFolderId;
+if (Upload SRT berhasil?) then (Ya)
+else (Gagal)
+    |Frontend (React)|
+    :Tampilkan error toast\ndengan pesan dari API;
+    stop
+endif
+
+|Frontend (React)|
+:Progress: "Mengupload file TXT...";
+
+|Google Drive API|
+:Upload "{filename}.txt"\nke dayFolderId;
+if (Upload TXT berhasil?) then (Ya)
+else (Gagal)
+    |Frontend (React)|
+    :Tampilkan error toast;
+    stop
+endif
+
+|Frontend (React)|
+:Progress: "Selesai!";
+:Tampilkan toast sukses\n"Berhasil dibagikan ke\nGoogle Drive";
+:Tampilkan ikon centang\nhijau di UI;
+:shareSuccess = true;
+
+|Editor|
+:File tersedia\ndi Drive owner;
+
+|Google Drive API|
+note right
+  Owner dapat melihat file
+  dari browser/mobile Drive
+  tanpa perlu install aplikasi
+end note
+
+stop
+
+@enduml

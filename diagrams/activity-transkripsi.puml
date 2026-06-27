@@ -1,0 +1,144 @@
+@startuml Activity Diagram — Proses Transkripsi
+
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 11
+skinparam backgroundColor white
+skinparam roundcorner 10
+skinparam shadowing false
+
+skinparam activity {
+    BackgroundColor #EFF6FF
+    BorderColor #2563EB
+    FontColor #1a1a1a
+    ArrowColor #374151
+    DiamondBackgroundColor #FEF9C3
+    DiamondBorderColor #D97706
+    DiamondFontColor #78350F
+    StartColor #1E3A5F
+    EndColor #1E3A5F
+    BarColor #2563EB
+}
+
+skinparam swimlane {
+    BorderColor #CBD5E1
+    TitleBackgroundColor #1E3A5F
+    TitleFontColor white
+    TitleFontStyle bold
+}
+
+skinparam note {
+    BackgroundColor #FFFBEB
+    BorderColor #D97706
+    FontColor #92400E
+    FontSize 9
+}
+
+title Activity Diagram — Proses Transkripsi Audio\n
+
+|#EFF6FF|Editor|
+|#F0FDF4|Frontend (React)|
+|#FEF2F2|Backend Rust|
+
+|Editor|
+start
+:Konfigurasi pengaturan transkripsi\n(model, bahasa, diarisasi, format);
+
+if (Mode?) then (Standalone)
+    :Pilih file audio\ndari sistem file;
+    |Frontend (React)|
+    :Validasi file audio dipilih;
+else (DaVinci Resolve)
+    |Frontend (React)|
+    :Panggil Resolve API\nambil info timeline;
+    |Backend Rust|
+    :Ambil audio dari\ntrack Resolve;
+    |Frontend (React)|
+endif
+
+:Validasi semua\ninput lengkap;
+:Tombol "Mulai Transkripsi"\naktif;
+
+|Editor|
+:Klik "Mulai Transkripsi";
+
+|Frontend (React)|
+:Set isTranscribing = true;
+:Reset progress = 0%;
+
+|Backend Rust|
+:Invoke transcribe_audio\ndengan opsi;
+
+fork
+    :Reset SHOULD_CANCEL flag;
+    :Konversi audio ke WAV\n16kHz mono (FFmpeg);
+note right
+  FFmpeg binary
+  di-bundle dalam app
+end note
+    :Load model Whisper\ndari disk lokal;
+note right
+  Model tersimpan di
+  ~/Library/Application Support/
+  com.takoto/models/
+end note
+    :Inisialisasi Whisper context\n(CoreML/Metal/Vulkan);
+    :Jalankan Whisper inference\ndengan full params;
+    :Emit progress events\nke frontend (0–100%);
+
+    |Frontend (React)|
+    :Update progress bar\nsecara real-time;
+
+    |Editor|
+    if (Ingin membatalkan?) then (Ya)
+        :Klik "Batalkan";
+        |Frontend (React)|
+        :Invoke cancel_transcription;
+        |Backend Rust|
+        :Set SHOULD_CANCEL = true;
+        :Hentikan inference\npada iterasi berikut;
+        |Frontend (React)|
+        :Reset UI state;
+        stop
+    else (Tidak)
+    endif
+
+    |Backend Rust|
+    :Hasil segments Whisper\n(teks + timestamps per kata);
+
+fork again
+    if (Diarisasi diaktifkan?) then (Ya)
+        :Load Pyannote ONNX model;
+        :Jalankan diarisasi audio\n(siapa bicara kapan);
+        :Emit diarize progress\nke frontend;
+        :Hasil: speaker segments\n(start, end, speaker_id);
+    else (Tidak)
+        :Lanjut tanpa\nspeaker info;
+    endif
+end fork
+
+:Merge hasil Whisper +\nhasil Pyannote (jika ada);
+:Buat objek Transcript\n(segments, words, speakers);
+:Simpan transcript ke JSON\ndi Application Data;
+:Return Transcript ke frontend;
+
+|Frontend (React)|
+:Proses subtitle:\n- Split berdasarkan pengaturan\n- Format teks (case, sensor)\n- Assign speaker_id;
+:Tampilkan subtitle\ndi panel kanan;
+:Set isTranscribing = false;
+
+|Editor|
+:Review hasil transkripsi;
+
+fork
+    :Edit subtitle\n(format, teks, speaker);
+fork again
+    :Ekspor SRT / JSON;
+fork again
+    :Bagikan ke Google Drive;
+fork again
+    :Push ke timeline\nDaVinci Resolve;
+end fork
+
+stop
+
+@enduml

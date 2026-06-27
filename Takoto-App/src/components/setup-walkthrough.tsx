@@ -62,11 +62,11 @@ export const SetupWalkthrough = ({
                   onValueChange={(value) => updateSetting("isStandaloneMode", value === "standalone")}
                   className="w-full max-w-[400px]"
                 >
-                  <TabsList className="w-full rounded-full bg-muted">
-                    <TabsTrigger value="resolve" className="flex-1 rounded-full text-sm">
+                  <TabsList className="w-full bg-muted">
+                    <TabsTrigger value="resolve" className="flex-1 text-sm">
                       Resolve
                     </TabsTrigger>
-                    <TabsTrigger value="standalone" className="flex-1 rounded-full text-sm">
+                    <TabsTrigger value="standalone" className="flex-1 text-sm">
                       Standalone
                     </TabsTrigger>
                   </TabsList>

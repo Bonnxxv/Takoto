@@ -115,6 +115,16 @@ export interface Settings {
     highlightColor: string;
 }
 
+export interface EditorProfile {
+    email: string;
+    name: string;
+    picture: string;
+    sub: string;
+    accessToken: string;
+    refreshToken?: string;
+    tokenExpiry: number; // Unix timestamp (seconds)
+}
+
 export interface TranscriptionOptions {
     audioPath: string,
     offset: number,

@@ -10,9 +10,13 @@ export default {
   theme: {
   	extend: {
   		borderRadius: {
-  			lg: 'calc(var(--radius) + 2px)',
-  			md: 'var(--radius)',
-  			sm: 'calc(var(--radius) - 1px)'
+  			/* Notion rounded scale */
+  			xs:   '4px',     /* form fields, small tags */
+  			sm:   '5px',     /* menu items, list rows */
+  			md:   '8px',     /* utility / nav buttons, smaller cards */
+  			lg:   '12px',    /* feature cards, illustration frames */
+  			xl:   '16px',    /* large containers, image wells */
+  			full: '9999px',  /* pill CTAs, badges, circular icons */
   		},
   		colors: {
   			background: 'hsl(var(--background))',
@@ -66,6 +70,9 @@ export default {
   				ring: 'hsl(var(--sidebar-ring))'
   			}
   		},
+  		fontFamily: {
+  			sans: ['"Google Sans"', 'Inter', '-apple-system', 'system-ui', '"Segoe UI"', 'Helvetica', 'Arial', 'sans-serif'],
+  		},
   		keyframes: {
   			'accordion-down': {
   				from: {
@@ -92,4 +99,3 @@ export default {
   },
   plugins: [tailwindcssAnimate],
 }
-

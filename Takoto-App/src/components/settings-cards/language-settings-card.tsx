@@ -6,6 +6,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
 
 const languages = [
   { label: "Auto (default)", value: "auto" },
@@ -126,8 +127,7 @@ export const LanguageSettingsCard = ({
   const [openSourceLanguages, setOpenSourceLanguages] = React.useState(false)
 
   return (
-    <div className="border rounded-lg overflow-hidden">
-      <div className="p-3.5">
+    <Card className="p-3.5 shadow-none relative">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
@@ -154,7 +154,7 @@ export const LanguageSettingsCard = ({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="p-0 w-full">
+          <PopoverContent className="p-0 w-[var(--radix-popover-trigger-width)]">
             <Command className="max-h-[250px]">
               <CommandInput placeholder="Cari bahasa..." />
               <CommandList>
@@ -224,7 +224,6 @@ export const LanguageSettingsCard = ({
             />
           </div>
         )}
-      </div>
-    </div>
+    </Card>
   )
 }

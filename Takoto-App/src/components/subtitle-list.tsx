@@ -3,6 +3,7 @@ import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { useGlobal } from "@/contexts/GlobalContext"
 import { Subtitle, type Word } from "@/types/interfaces"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { ArrowLeft, ArrowRight, Pencil, XCircle as XCircleIcon } from "lucide-react"
 import {
     Dialog,
@@ -345,7 +346,10 @@ const SubtitleList = ({
                             return (
                                 <div
                                     key={`${actualIndex}-${subtitle.text.slice(0, 20)}`} // Include content in key for proper re-rendering
-                                    className={`group relative flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight hover:bg-muted/50 dark:hover:bg-muted/20 ${itemClassName}`}
+                                    className={cn(
+                                        "group relative flex flex-col items-start gap-2 border-b px-4 py-3.5 text-sm leading-tight hover:bg-muted/50 dark:hover:bg-muted/20",
+                                        itemClassName
+                                    )}
                                     style={{ 
                                         minHeight: ESTIMATED_ITEM_HEIGHT - 20 // Allow natural height with minimum
                                     }}

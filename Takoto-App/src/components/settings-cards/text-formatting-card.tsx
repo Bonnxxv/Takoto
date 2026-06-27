@@ -1,4 +1,4 @@
-import { AArrowUp, Signature, ShieldX, WholeWord, CircleX, Settings, CircleFadingArrowUp } from "lucide-react"
+import { AArrowUp, Signature, ShieldX, WholeWord, CircleX, Settings, CircleFadingArrowUp, History } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Card } from "@/components/ui/card"
  
 import { useState } from "react";
 import { useGlobal } from "@/contexts/GlobalContext";
@@ -36,9 +37,10 @@ interface TextFormattingCardProps {
   onTextCaseChange: (textCase: "none" | "uppercase" | "lowercase" | "titlecase") => void
   onRemovePunctuationChange: (checked: boolean) => void
   onSplitOnPunctuationChange: (checked: boolean) => void
-  onEnableCensorChange: (checked: boolean) => void
+  onEnableCensorChange: (value: boolean) => void
   onCensoredWordsChange: (words: string[]) => void
-  isWalkthroughMode: boolean
+  onResetSettings?: () => void
+  isWalkthroughMode?: boolean
 }
 
 export const TextFormattingCard = ({
@@ -58,15 +60,15 @@ export const TextFormattingCard = ({
   onSplitOnPunctuationChange,
   onEnableCensorChange,
   onCensoredWordsChange,
-  isWalkthroughMode
+  onResetSettings,
+  isWalkthroughMode = false
 }: TextFormattingCardProps) => {
   const [newCensoredWord, setNewCensoredWord] = useState("");
   const { reformatSubtitles } = useGlobal();
   return (
     <div className="space-y-3">
       {/* Formatting Controls Popover */}
-      <div className="border rounded-lg overflow-hidden">
-        <div className="p-3.5">
+      <Card className="p-3.5 shadow-none relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
@@ -165,13 +167,10 @@ export const TextFormattingCard = ({
               </PopoverContent>
             </Popover>
           </div>
-
-        </div>
-      </div>
+      </Card>
 
       {/* Text Case */}
-      <div className="border rounded-lg overflow-hidden">
-        <div className="p-3.5">
+      <Card className="p-3.5 shadow-none relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
@@ -199,11 +198,10 @@ export const TextFormattingCard = ({
               </Select>
             </div>
           </div>
-        </div>
-      </div>
+      </Card>
 
       {/* Remove Punctuation */}
-      <div className="flex items-center justify-between p-3.5 border rounded-lg">
+      <Card className="flex items-center justify-between p-3.5 shadow-none relative">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
             <Signature className="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
@@ -217,11 +215,10 @@ export const TextFormattingCard = ({
           checked={removePunctuation}
           onCheckedChange={onRemovePunctuationChange}
         />
-      </div>
+      </Card>
 
       {/* Censored Words */}
-      <div className="border rounded-lg overflow-hidden">
-        <div className="p-3.5">
+      <Card className="p-3.5 shadow-none relative">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30">
@@ -296,33 +293,41 @@ export const TextFormattingCard = ({
               </div>
             </div>
           )}
-        </div>
-      </div>
+      </Card>
       {isWalkthroughMode ? null : (
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              variant="secondary"
-              size="default"
-              className="w-full"
-            >
-              <CircleFadingArrowUp className="w-5 h-5 mr-2" />
-              Perbarui Subtitle
+        <div className="space-y-2 mt-3">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="secondary"
+                size="default"
+                className="w-full"
+              >
+                <CircleFadingArrowUp className="w-5 h-5 mr-2" />
+                Perbarui Subtitle
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Ini akan membuang semua pengeditan subtitle manual dan membuat ulang subtitle menggunakan opsi pemformatan baru.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
+                <AlertDialogAction onClick={reformatSubtitles}>Perbarui Subtitle</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+
+          {onResetSettings && (
+            <Button variant="outline" className="w-full" onClick={onResetSettings}>
+              <History className="h-4 w-4 mr-2" />
+              Reset Pengaturan
             </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Ini akan membuang semua pengeditan subtitle manual dan membuat ulang subtitle menggunakan opsi pemformatan baru.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Batal</AlertDialogCancel>
-              <AlertDialogAction onClick={reformatSubtitles}>Perbarui Subtitle</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          )}
+        </div>
       )}
     </div>
   )

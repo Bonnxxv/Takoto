@@ -1,0 +1,150 @@
+@startuml Use Case Diagram — Takoto
+
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 11
+skinparam backgroundColor white
+skinparam roundcorner 8
+
+skinparam actor {
+    BackgroundColor #DBEAFE
+    BorderColor #2563EB
+    FontColor #1E3A5F
+    FontStyle bold
+}
+
+skinparam usecase {
+    BackgroundColor #EFF6FF
+    BorderColor #2563EB
+    FontColor #1a1a1a
+    ArrowColor #374151
+}
+
+skinparam rectangle {
+    BackgroundColor #F8FAFC
+    BorderColor #2563EB
+    BorderThickness 2
+    FontColor #1E3A5F
+    FontStyle bold
+    FontSize 13
+}
+
+skinparam note {
+    BackgroundColor #FFFBEB
+    BorderColor #D97706
+    FontColor #92400E
+    FontSize 9
+}
+
+left to right direction
+
+' ====== ACTORS ======
+actor "Editor" as editor #DBEAFE
+actor "Owner /\nSupervisor" as owner #D1FAE5
+
+actor "Google\nOAuth" as google <<external>> #FEE2E2
+actor "Google\nDrive" as gdrive <<external>> #FEE2E2
+actor "DaVinci\nResolve" as resolve <<external>> #F3E8FF
+
+' ====== SYSTEM BOUNDARY ======
+rectangle "Sistem Takoto" {
+
+    ' ----- Auth -----
+    usecase "Masuk dengan\nGoogle (Login)" as UC1
+    usecase "Keluar\n(Logout)" as UC2
+
+    ' ----- Model -----
+    usecase "Download\nModel AI" as UC3
+    usecase "Hapus\nModel AI" as UC4
+
+    ' ----- Input Audio -----
+    usecase "Pilih File Audio\n(Standalone)" as UC5
+    usecase "Ambil Audio dari\nTimeline Resolve" as UC6
+
+    ' ----- Transkripsi -----
+    usecase "Transkripsi\nAudio" as UC7
+    usecase "Identifikasi\nPembicara (Diarisasi)" as UC8
+    usecase "Batalkan\nTranskripsi" as UC9
+
+    ' ----- Edit -----
+    usecase "Edit Subtitle\n(Format & Teks)" as UC10
+    usecase "Atur Nama\nPembicara" as UC11
+
+    ' ----- Output -----
+    usecase "Ekspor File\nSRT / JSON" as UC12
+    usecase "Impor File\nSRT" as UC13
+    usecase "Bagikan ke\nGoogle Drive" as UC14
+    usecase "Push Subtitle ke\nTimeline Resolve" as UC15
+
+    ' ----- Owner -----
+    usecase "Pantau Hasil\nTranskripsi" as UC16
+
+}
+
+' ====== RELATIONSHIPS ======
+
+' Editor — Auth
+editor --> UC1
+editor --> UC2
+
+' Editor — Model
+editor --> UC3
+editor --> UC4
+
+' Editor — Input
+editor --> UC5
+editor --> UC6
+
+' Editor — Transkripsi
+editor --> UC7
+editor --> UC9
+
+' Editor — Edit
+editor --> UC10
+editor --> UC11
+
+' Editor — Output
+editor --> UC12
+editor --> UC13
+editor --> UC14
+editor --> UC15
+
+' Owner
+owner --> UC16
+
+' Include relationships
+UC7 .> UC8 : <<include>>\n(jika diarisasi aktif)
+UC7 .> UC5 : <<include>>\n(standalone mode)
+UC7 .> UC6 : <<include>>\n(resolve mode)
+UC14 .> UC1 : <<include>>\n(butuh login)
+
+' Extend relationships
+UC7 .> UC9 : <<extend>>
+UC10 .> UC11 : <<extend>>
+
+' External system connections
+UC1 --> google
+UC14 --> gdrive
+UC16 --> gdrive
+UC6 --> resolve
+UC15 --> resolve
+
+' Notes
+note right of UC8
+  Menggunakan model
+  Pyannote.rs (ONNX)
+  berjalan secara lokal
+end note
+
+note right of UC14
+  File SRT + TXT
+  diunggah ke folder
+  Drive milik owner
+end note
+
+note bottom of UC7
+  Model Whisper berjalan
+  sepenuhnya on-device
+  (tanpa internet)
+end note
+
+@enduml

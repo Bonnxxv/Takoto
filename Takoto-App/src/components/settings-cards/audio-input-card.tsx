@@ -115,7 +115,7 @@ export const AudioInputCard = ({ selectedTracks, onTracksChange, callRefresh, wa
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="min-w-[320px] p-0 overflow-hidden" align="start">
+            <PopoverContent className="w-[var(--radix-popover-trigger-width)] min-w-[280px] p-0 overflow-hidden" align="start">
               {inputTracks.length > 0 ? (
                 <div className="px-4 py-2 bg-gradient-to-br from-red-50/80 to-orange-50/80 dark:from-red-950/50 dark:to-orange-950/50 border-b">
                   <div className="flex items-center justify-between min-h-[28px]">

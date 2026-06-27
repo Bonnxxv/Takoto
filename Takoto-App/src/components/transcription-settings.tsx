@@ -2,9 +2,7 @@ import * as React from "react"
 import {
     ChevronDown as ChevronDownIcon,
     Captions,
-    HelpCircle,
     RefreshCcw,
-    History,
     LoaderCircle,
     CirclePlay,
     Copy,
@@ -46,13 +44,9 @@ import { Gauge } from "lucide-react"
 import { writeText } from "@tauri-apps/plugin-clipboard-manager"
 import { openPath } from "@tauri-apps/plugin-opener"
 
-interface TranscriptionSettingsProps {
-    onShowTutorial?: () => void
-}
+interface TranscriptionSettingsProps {}
 
-export const TranscriptionSettings = ({
-    onShowTutorial
-}: TranscriptionSettingsProps) => {
+export const TranscriptionSettings = ({}: TranscriptionSettingsProps) => {
     const isMobile = useIsMobile()
     const {
         settings,
@@ -224,11 +218,11 @@ export const TranscriptionSettings = ({
 
     return (
         <>
-            <div className="flex flex-col h-[calc(100vh-60px)] bg-background">
-                <div className="flex-1 p-4 space-y-5 overflow-y-auto">
+            <div className="flex flex-col h-full bg-background relative">
+                <div className="flex-1 p-4 pt-[69px] space-y-5 overflow-y-auto pb-[160px] no-scrollbar">
                     <div className="space-y-3">
                         <div className="flex items-center gap-2">
-                            <h3 className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-primary uppercase tracking-wider flex items-center gap-2">
                                 {settings.isStandaloneMode ? "Sumber File" : "DaVinci Resolve"}
                             </h3>
                             {!settings.isStandaloneMode && (
@@ -250,7 +244,7 @@ export const TranscriptionSettings = ({
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                <Card className="flex items-center gap-2 px-1.5 py-1 shadow-none rounded bg-secondary">
+                                <Card className="flex items-center gap-2 px-1.5 py-1 shadow-none bg-secondary">
                                     <img
                                         src="/davinci-resolve-logo.png"
                                         alt="DaVinci Resolve Logo"
@@ -315,7 +309,7 @@ export const TranscriptionSettings = ({
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
                                     <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
                                         Pemrosesan
                                     </h3>
                                 </Button>
@@ -360,7 +354,7 @@ export const TranscriptionSettings = ({
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
                                     <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
                                         Eksperimental
                                     </h3>
                                 </Button>
@@ -374,26 +368,24 @@ export const TranscriptionSettings = ({
                                     onEnableDTWChange={(checked) => updateSetting("enableDTW", checked)}
                                 />
 
-                                <div className="border rounded-lg overflow-hidden">
-                                    <div className="p-3.5">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
-                                                    <Gauge className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-1">
-                                                        <p className="text-sm font-medium">Akselerasi GPU</p>
-                                                    </div>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        Meningkatkan kecepatan transkripsi
-                                                    </p>
-                                                </div>
+                                <Card className="p-3.5 shadow-none relative">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 rounded-lg bg-yellow-100 dark:bg-yellow-900/30">
+                                                <Gauge className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                                             </div>
-                                            <Switch checked={settings.enableGpu} onCheckedChange={(checked) => updateSetting("enableGpu", checked)} />
+                                            <div>
+                                                <div className="flex items-center gap-1">
+                                                    <p className="text-sm font-medium">Akselerasi GPU</p>
+                                                </div>
+                                                <p className="text-xs text-muted-foreground">
+                                                    Meningkatkan kecepatan transkripsi
+                                                </p>
+                                            </div>
                                         </div>
+                                        <Switch checked={settings.enableGpu} onCheckedChange={(checked) => updateSetting("enableGpu", checked)} />
                                     </div>
-                                </div>
+                                </Card>
                             </div>
                         </CollapsibleContent>
                     </Collapsible>
@@ -403,7 +395,7 @@ export const TranscriptionSettings = ({
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
                                     <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
                                         Format Teks
                                     </h3>
                                 </Button>
@@ -428,6 +420,7 @@ export const TranscriptionSettings = ({
                                 onSplitOnPunctuationChange={(checked) => updateSetting("splitOnPunctuation", checked)}
                                 onEnableCensorChange={(checked) => updateSetting("enableCensor", checked)}
                                 onCensoredWordsChange={(words) => updateSetting("censoredWords", words)}
+                                onResetSettings={resetSettings}
                                 isWalkthroughMode={false}
                             />
                         </CollapsibleContent>
@@ -438,7 +431,7 @@ export const TranscriptionSettings = ({
                             <CollapsibleTrigger asChild>
                                 <Button variant="ghost" className="flex items-center gap-2 p-0 h-auto group">
                                     <ChevronDownIcon className="h-4 w-4 transition-transform duration-200 group-data-[state=closed]:-rotate-90" />
-                                    <h3 className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                                    <h3 className="text-sm font-medium text-primary uppercase tracking-wider">
                                         Tentang
                                     </h3>
                                 </Button>
@@ -455,26 +448,12 @@ export const TranscriptionSettings = ({
                                         <li>• Tsabit Alauddin Kuswandaru</li>
                                     </ul>
                                 </div>
-                                <div className="flex gap-2">
-                                    <Button
-                                        variant="outline"
-                                        className="flex-1"
-                                        onClick={onShowTutorial}
-                                    >
-                                        <HelpCircle className="h-4 w-4 mr-2" />
-                                        Tutorial
-                                    </Button>
-                                </div>
-                                <Button variant="outline" className="w-full" onClick={resetSettings}>
-                                    <History className="h-4 w-4 mr-2" />
-                                    Reset Pengaturan
-                                </Button>
                             </div>
                         </CollapsibleContent>
                     </Collapsible>
                 </div>
 
-                <div className="sticky bottom-0 p-4 border-t bg-background/5 backdrop-blur-lg shadow-2xl space-y-3.5">
+                <div className="absolute bottom-0 left-0 right-0 p-4 border-t frosted-glass shadow-apple-md space-y-3.5 z-10">
 
                     {isModelDownloading && (
                         <div className="space-y-1">
