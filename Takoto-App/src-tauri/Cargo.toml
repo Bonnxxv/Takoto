@@ -1,6 +1,6 @@
 [package]
 name = "takoto"
-version = "3.5.0"
+version = "3.5.1"
 description = "Transcribe and diarize audio files"
 authors = ["Bona Tua", "Tsabit", "Yosia Gabriel"]
 edition = "2024"
